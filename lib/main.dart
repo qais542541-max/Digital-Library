@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'student_screens/main_student_screen.dart'; // تأكد من مسار الملف
+import 'features/student/screens/main_student_screen.dart'; // تأكد من مسار الملف
 
 void main() {
   runApp(const DigitalLibraryApp());

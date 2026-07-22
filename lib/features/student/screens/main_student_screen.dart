@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'my_courses_screen.dart';
-import '../core/screens/general_library_screen.dart'; // شاشة المكتبة العامة
-import 'ai_assistant_screen.dart';
-import '../core/screens/general_main_screen.dart';// مسار الشاشة الرئيسية الجديدة المشتركة
-import '../core/widgets/custom_drawer.dart';//استدعاء ملف ايقونة القائمة الجانبية
+import '../../library/screens/general_library_screen.dart'; // شاشة المكتبة العامة
+import '../../ai_assistant/ai_assistant_screen.dart';
+import '../../library/screens/general_main_screen.dart';// مسار الشاشة الرئيسية الجديدة المشتركة
+import '../../../core/widgets/custom_drawer.dart';//استدعاء ملف ايقونة القائمة الجانبية
 
 
 class MainStudentScreen extends StatefulWidget {

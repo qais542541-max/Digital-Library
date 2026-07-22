@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../widgets/unified_item_card.dart';
+import '../../../core/widgets/unified_item_card.dart';
 import 'books_list_screen.dart'; // استدعاء شاشة قائمة الكتب الجديدة
-import '../widgets/custom_drawer.dart'; // 👈 1. استدعاء ملف القائمة الجانبية هنا
+import '../../../core/widgets/custom_drawer.dart'; // 👈 1. استدعاء ملف القائمة الجانبية هنا
 
 class GeneralLibraryScreen extends StatelessWidget {
   const GeneralLibraryScreen({super.key});
@@ -93,7 +93,9 @@ class GeneralLibraryScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => BooksListScreen(
-                  categoryName: categories[index]['title'],
+                  categoryName: 'روايات', // مثال
+                  categoryId: 5, // مثال لرقم التصنيف
+                  subjectId: 0, // 👈 أضف هذا السطر هنا أيضاً
                 ),
               ),
             );

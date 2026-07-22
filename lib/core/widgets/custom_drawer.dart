@@ -83,7 +83,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             trailing: Switch(
               value: isDarkMode,
-              activeColor: const Color(0xFF2E7D32),
+              activeThumbColor: const Color(0xFF2E7D32),
               onChanged: (value) {
                 setState(() {
                   isDarkMode = value;

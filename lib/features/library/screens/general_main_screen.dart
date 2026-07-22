@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widgets/unified_item_card.dart';
-import '../widgets/custom_drawer.dart';
+import '../../../core/widgets/unified_item_card.dart';
+import '../../../core/widgets/custom_drawer.dart';
 
 class GeneralMainScreen extends StatelessWidget {
   // متغيرات ديناميكية لجعل الشاشة صالحة للطالب والدكتور

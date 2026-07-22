@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 // استدعاء شاشة قارئ الـ PDF
-import '../../student_screens/pdf_viewer_screen.dart';
+import 'pdf_viewer_screen.dart';
 // استدعاء البطاقة الموحدة
-import '../widgets/unified_item_card.dart';
+import '../../../core/widgets/unified_item_card.dart';
 
-import '../widgets/custom_drawer.dart';
+import '../../../core/widgets/custom_drawer.dart';
 //استدعاء ايقونة القائمة الجانبية
+
+
 
 
 class BooksListScreen extends StatefulWidget {
   final String categoryName;
+  final int categoryId; // 👈 1. أضفنا متغير رقم القسم هنا
+  final int subjectId;  // 👈 2. أضفنا متغير رقم المادة هنا
 
   const BooksListScreen({
     super.key,
     required this.categoryName,
+    required this.categoryId, // 👈 3. جعلنا استقباله إلزامياً
+    required this.subjectId,  // 👈 4. جعلنا استقباله إلزامياً
   });
 
   @override
@@ -23,6 +29,7 @@ class BooksListScreen extends StatefulWidget {
 class _BooksListScreenState extends State<BooksListScreen> {
   @override
   Widget build(BuildContext context) {
+    // ... باقي كود التصميم الخاص بك
     // التحقق مما إذا كان القسم الحالي هو قسم المشاريع
     final bool isProjectsCategory = widget.categoryName == 'مشاريع التخرج';
 

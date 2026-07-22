@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import '../core/widgets/unified_item_card.dart';
-import '../core/screens/course_details_screen.dart';
-import '../core/widgets/custom_drawer.dart';
+import '../../../core/widgets/unified_item_card.dart';
+import '../../../core/widgets/custom_drawer.dart';
+import 'subject_details_screen.dart';// اسم ملف واجهة المادة الخاص بك
+import '../../../models/dummy_data.dart';
+
+
 
 
 
@@ -83,39 +86,43 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            _buildCoursesList(term1Courses),
-            _buildCoursesList(term2Courses),
-          ],
-        ),
+
       ),
     );
   }
 
-  Widget _buildCoursesList(List<Map<String, String>> courses) {
+  Widget _buildCoursesList() {
     return ListView.builder(
       padding: const EdgeInsets.only(top: 16, bottom: 20, left: 16, right: 16),
-      itemCount: courses.length,
+      // 1. هنا نضع عدد العناصر بناءً على البيانات الوهمية التي أنشأناها
+      itemCount: dummySubjects.length,
       itemBuilder: (context, index) {
+        // 2. نستخرج المقرر الحالي من القائمة
+        final subject = dummySubjects[index];
+
         return Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
-          child: UnifiedItemCard(
-            title: courses[index]['title']!,
-            subtitle: 'أستاذ المقرر: ${courses[index]['doctor']!}',
-            icon: Icons.folder_special,
-            isGridView: false,
+          // 3. نستخدم InkWell لتفعيل الضغط على البطاقة بالكامل
+          child: InkWell(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CourseDetailsScreen(
-                    // 🌐 [مكان ربط الـ API - PHP] : تمرير الـ ID الخاص بالمادة
-                    courseTitle: courses[index]['title']!,
+                  builder: (context) => SubjectDetailsScreen(
+                    subjectName: subject.title,
+                    subjectId: subject.id, // 👈 التمرير المباشر للرقم بدون toString()
                   ),
                 ),
               );
             },
+            // 4. هنا نضع تصميم البطاقة الخاصة بك
+            child: UnifiedItemCard(
+              title: subject.title,
+              icon: subject.icon,
+              subtitle: 'انقر لعرض الموارد', // 👈 أضفنا النص الفرعي
+              isGridView: true, // 👈 أضفنا طريقة العرض (true للشبكة، false للقائمة)
+              // onTap: () { ... } // (إذا كان لديك حدث عند الضغط)
+            )
           ),
         );
       },
