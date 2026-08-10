@@ -1,76 +1,93 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/unified_item_card.dart';
-import '../../library/screens/books_list_screen.dart'; // مسار شاشة عرض المحتوى
 
+// ملاحظة: لم نعد بحاجة لاستدعاء BooksListScreen هنا لأن المحتوى سيظهر داخل التوب بار
 
 class SubjectDetailsScreen extends StatelessWidget {
   final String subjectName;
-  final int subjectId; // 👈 1. أضفنا هذا المتغير
+  final int subjectId;
 
   const SubjectDetailsScreen({
     Key? key,
     required this.subjectName,
-    required this.subjectId, // 👈 2. طلبنا تمريره بشكل إلزامي هنا
+    required this.subjectId,
   }) : super(key: key);
-
-  // ... (باقي الكود كما هو)
 
   @override
   Widget build(BuildContext context) {
-
-    // أضفنا 'id' لكل قسم لكي يفهمه الـ API لاحقاً
+    // الأقسام الأربعة، احتفظنا بالـ id لربطه بالـ API لاحقاً
     final List<Map<String, dynamic>> subjectCategories = [
-      {'id': 1, 'title': 'الملازم', 'icon': Icons.menu_book, 'subtitle': 'مذكرات وملخصات'},
-      {'id': 2, 'title': 'المحاضرات', 'icon': Icons.ondemand_video, 'subtitle': 'شروحات وعروض'},
-      {'id': 3, 'title': 'التكاليف', 'icon': Icons.assignment, 'subtitle': 'الواجبات العملية'},
-      {'id': 4, 'title': 'النماذج', 'icon': Icons.quiz, 'subtitle': 'أسئلة وامتحانات'},
+      {'id': 1, 'title': 'الملازم', 'icon': Icons.menu_book},
+      {'id': 2, 'title': 'المحاضرات', 'icon': Icons.ondemand_video},
+      {'id': 3, 'title': 'التكاليف', 'icon': Icons.assignment},
+      {'id': 4, 'title': 'النماذج', 'icon': Icons.quiz},
     ];
 
-    return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2E7D32),
-        elevation: 0,
-        title: Text(
-          subjectName, // عرض اسم المادة في الأعلى
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+    // استخدام DefaultTabController لإنشاء التوب بار بعدد الأقسام (4)
+    return DefaultTabController(
+      length: subjectCategories.length,
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade50,
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF2E7D32),
+          elevation: 0,
+          title: Text(
+            subjectName,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          iconTheme: const IconThemeData(color: Colors.white),
 
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.85,
-        ),
-        itemCount: subjectCategories.length,
-        itemBuilder: (context, index) {
-          return UnifiedItemCard(
-            title: subjectCategories[index]['title'],
-            subtitle: subjectCategories[index]['subtitle'],
-            icon: subjectCategories[index]['icon'],
-            isGridView: true,
-            // 👇 دالة onTap واحدة فقط وديناميكية تكفي لكل الأقسام!
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BooksListScreen(
-                    // نأخذ اسم القسم ورقم القسم من المصفوفة بناءً على مكان الضغطة
-                    categoryName: subjectCategories[index]['title'],
-                    categoryId: subjectCategories[index]['id'],
-                    subjectId: subjectId, // رقم المادة الثابت الذي استقبلته الشاشة
-                  ),
-                ),
+          // 👇 إنشاء التوب بار هنا 👇
+          bottom: TabBar(
+            isScrollable: true, // يسمح بسحب التبويبات إذا كانت الشاشة صغيرة
+            labelColor: Colors.white, // لون النص للقسم المحدد
+            unselectedLabelColor: Colors.white70, // لون النص للقسم غير المحدد
+            indicatorColor: Colors.white, // لون الخط تحت القسم
+            indicatorWeight: 3,
+            tabs: subjectCategories.map((category) {
+              return Tab(
+                text: category['title'],
               );
-            },
-          );
-        },
+            }).toList(),
+          ),
+        ),
+
+        // 👇 المحتوى الذي يتغير بتغير القسم في التوب بار 👇
+        body: TabBarView(
+          children: subjectCategories.map((category) {
+            // نمرر الـ id واسم القسم لبناء القائمة الخاصة به
+            return _buildCategoryContent(category['id'], category['title'], category['icon']);
+          }).toList(),
+        ),
       ),
+    );
+  }
+
+  // دالة بناء محتوى كل قسم (قائمة الموارد الخاصة به)
+  Widget _buildCategoryContent(int categoryId, String categoryName, IconData categoryIcon) {
+
+    // 🌐 [مكان ربط الـ API - PHP]
+    // لاحقاً، سنستخدم subjectId و categoryId هنا لجلب الملفات من قاعدة البيانات
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: 5, // عدد عناصر وهمي للتجربة
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          child: UnifiedItemCard(
+            title: '$categoryName ${index + 1}', // يعرض مثلاً: ملزمة 1، محاضرة 2
+            subtitle: 'انقر لفتح المورد',
+            icon: categoryIcon,
+            isGridView: false, // 👈 جعلناها false لتظهر كقائمة منسقة تحت بعضها
+            onTap: () {
+              // هنا سنضع كود فتح ملف الـ PDF أو تشغيل الفيديو مستقبلاً
+              debugPrint('تم الضغط على $categoryName رقم ${index + 1}');
+            },
+          ),
+        );
+      },
     );
   }
 }
