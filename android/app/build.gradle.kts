@@ -8,7 +8,10 @@ plugins {
 android {
     namespace = "scc.edu.ye.digital_library"
     compileSdk = flutter.compileSdkVersion
+    //اضفت هذا السطر عشان المشاكل الي حصلت مع الاصدار القديم
+    buildToolsVersion = "35.0.0"
     ndkVersion = flutter.ndkVersion
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

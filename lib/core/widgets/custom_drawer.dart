@@ -1,5 +1,7 @@
+// هذا الملف خاص ب النافذة الجانبية
 import 'package:flutter/material.dart';
-
+import '../../features/downloads/screens/downloads_screen.dart'; // تأكد من تعديل النقاط بناءً على مسار الملف الحالي
+import '../../features/favorites/screens/favorites_screen.dart';
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
 
@@ -45,20 +47,35 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
           // 2. زر المفضلة
           _buildDrawerItem(
-            title: 'المفضلة',
-            icon: Icons.bookmark_border,
+            title: 'مفضلاتي',
+            icon: Icons.favorite_border,
             onTap: () {
-              // مسار الانتقال لشاشة المفضلة
-              print('تم الضغط على المفضلة');
+              Navigator.pop(context); // إغلاق القائمة الجانبية أولاً
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FavoritesScreen(), // تأكد من اسم الكلاس الخاص بشاشة التفضيلات
+                ),
+              );
             },
           ),
+          const Divider(height: 30, thickness: 1, indent: 20, endIndent: 20),
 
           // 3. زر تحميلاتي
           _buildDrawerItem(
             title: 'تحميلاتي',
             icon: Icons.file_download_outlined,
             onTap: () {
-              print('تم الضغط على تحميلاتي');
+              // 1. إغلاق القائمة الجانبية (Drawer) أولاً
+              Navigator.pop(context);
+
+              // 2. الانتقال إلى شاشة التحميلات
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DownloadsScreen(),
+                ),
+              );
             },
           ),
 
