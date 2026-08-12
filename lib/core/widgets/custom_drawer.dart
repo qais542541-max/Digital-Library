@@ -1,29 +1,29 @@
-// هذا الملف خاص ب النافذة الجانبية
 import 'package:flutter/material.dart';
-import '../../features/downloads/screens/downloads_screen.dart'; // تأكد من تعديل النقاط بناءً على مسار الملف الحالي
+import '../../features/downloads/screens/downloads_screen.dart';
 import '../../features/favorites/screens/favorites_screen.dart';
-class CustomDrawer extends StatefulWidget {
+import '../../features/settings/screens/settings_screen.dart';
+import '../../features/about_us/about_screen.dart';
+
+const Color appPrimaryGreen = Color(0xFF2E7D32);
+
+class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
 
   @override
-  State<CustomDrawer> createState() => _CustomDrawerState();
-}
-
-class _CustomDrawerState extends State<CustomDrawer> {
-  // متغير محلي لتغيير شكل زر الوضع المظلم (مؤقتاً حتى نربطه بإدارة الحالة)
-  bool isDarkMode = false;
-
-  @override
   Widget build(BuildContext context) {
+    // 1. قراءة حالة الوضع المظلم
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Drawer(
-      backgroundColor: Colors.white,
+      // 2. السحر هنا: خلفية رمادية داكنة في الوضع المظلم، وبيضاء في الفاتح
+      backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
       child: ListView(
-        padding: EdgeInsets.zero, // لإلغاء الهامش العلوي الافتراضي
+        padding: EdgeInsets.zero,
         children: [
-          // 1. رأس القائمة (Drawer Header) - مساحة خضراء في الأعلى لشعار التطبيق
+          // رأس القائمة
           DrawerHeader(
             decoration: const BoxDecoration(
-              color: Color(0xFF2E7D32), // اللون الأخضر المعتمد في تطبيقك
+              color: appPrimaryGreen,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,7 +32,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 30,
-                  child: Icon(Icons.local_library, size: 35, color: Color(0xFF2E7D32)),
+                  child: Icon(Icons.local_library, size: 35, color: appPrimaryGreen),
                 ),
                 SizedBox(height: 12),
                 Text(
@@ -45,78 +45,57 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
           const SizedBox(height: 10),
 
-          // 2. زر المفضلة
+          // تمرير حالة الثيم (isDarkMode) لكل زر ليتكيف لونه
           _buildDrawerItem(
+            context: context,
             title: 'مفضلاتي',
             icon: Icons.favorite_border,
+            isDarkMode: isDarkMode,
             onTap: () {
-              Navigator.pop(context); // إغلاق القائمة الجانبية أولاً
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const FavoritesScreen(), // تأكد من اسم الكلاس الخاص بشاشة التفضيلات
-                ),
-              );
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const FavoritesScreen()));
             },
           ),
-          const Divider(height: 30, thickness: 1, indent: 20, endIndent: 20),
 
-          // 3. زر تحميلاتي
+          const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
+
           _buildDrawerItem(
+            context: context,
             title: 'تحميلاتي',
             icon: Icons.file_download_outlined,
+            isDarkMode: isDarkMode,
             onTap: () {
-              // 1. إغلاق القائمة الجانبية (Drawer) أولاً
               Navigator.pop(context);
-
-              // 2. الانتقال إلى شاشة التحميلات
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DownloadsScreen(),
-                ),
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const DownloadsScreen()));
             },
           ),
 
-          // فاصل خطي خفيف لتنظيم القائمة
-          const Divider(height: 30, thickness: 1, indent: 20, endIndent: 20),
+          const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
 
-          // 4. زر الإعدادات
           _buildDrawerItem(
+            context: context,
             title: 'إعدادات',
             icon: Icons.settings_outlined,
+            isDarkMode: isDarkMode,
             onTap: () {
-              print('تم الضغط على الإعدادات');
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
             },
           ),
 
-          // 5. زر الوضع المظلم (باستخدام Switch)
-          ListTile(
-            leading: const Icon(Icons.dark_mode_outlined, color: Colors.black87, size: 28),
-            title: const Text(
-              'الوضع المظلم',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            trailing: Switch(
-              value: isDarkMode,
-              activeThumbColor: const Color(0xFF2E7D32),
-              onChanged: (value) {
-                setState(() {
-                  isDarkMode = value;
-                });
-                // 🌐 مكان ربط تغيير ثيم التطبيق بالكامل
-                print('الوضع المظلم الآن: $isDarkMode');
-              },
-            ),
-          ),
+          const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
 
-          // 6. زر من نحن
           _buildDrawerItem(
+            context: context,
             title: 'من نحن',
-            icon: Icons.info_outline, // أيقونة مشابهة للصورة
+            icon: Icons.info_outline,
+            isDarkMode: isDarkMode,
             onTap: () {
-              print('تم الضغط على من نحن');
+              Navigator.pop(context); // إغلاق القائمة الجانبية
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AboutScreen()), // الانتقال لصفحة من نحن
+              );
             },
           ),
         ],
@@ -124,13 +103,25 @@ class _CustomDrawerState extends State<CustomDrawer> {
     );
   }
 
-  // دالة مساعدة برمجية لبناء الأزرار بشكل نظيف وموحد (DRY Principle)
-  Widget _buildDrawerItem({required String title, required IconData icon, required VoidCallback onTap}) {
+  // 3. دالة بناء الأزرار أصبحت ذكية الآن
+  Widget _buildDrawerItem({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required bool isDarkMode,
+    required VoidCallback onTap
+  }) {
     return ListTile(
-      leading: Icon(icon, color: Colors.black87, size: 28),
+      // الأيقونة بيضاء باهتة في المظلم، وسوداء في الفاتح
+      leading: Icon(icon, color: isDarkMode ? Colors.white70 : Colors.black87, size: 28),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          // النص أبيض في المظلم، وأسود في الفاتح ليكون واضحاً دائماً
+          color: isDarkMode ? Colors.white : Colors.black87,
+        ),
       ),
       onTap: onTap,
     );
