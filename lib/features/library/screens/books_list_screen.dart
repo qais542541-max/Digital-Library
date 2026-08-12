@@ -3,23 +3,18 @@ import 'package:flutter/material.dart';
 import 'pdf_viewer_screen.dart';
 // استدعاء البطاقة الموحدة
 import '../../../core/widgets/unified_item_card.dart';
-
 import '../../../core/widgets/custom_drawer.dart';
-//استدعاء ايقونة القائمة الجانبية
-
-
-
 
 class BooksListScreen extends StatefulWidget {
   final String categoryName;
-  final int categoryId; // 👈 1. أضفنا متغير رقم القسم هنا
-  final int subjectId;  // 👈 2. أضفنا متغير رقم المادة هنا
+  final int categoryId;
+  final int subjectId;
 
   const BooksListScreen({
     super.key,
     required this.categoryName,
-    required this.categoryId, // 👈 3. جعلنا استقباله إلزامياً
-    required this.subjectId,  // 👈 4. جعلنا استقباله إلزامياً
+    required this.categoryId,
+    required this.subjectId,
   });
 
   @override
@@ -29,26 +24,28 @@ class BooksListScreen extends StatefulWidget {
 class _BooksListScreenState extends State<BooksListScreen> {
   @override
   Widget build(BuildContext context) {
-    // ... باقي كود التصميم الخاص بك
-    // التحقق مما إذا كان القسم الحالي هو قسم المشاريع
-    final bool isProjectsCategory = widget.categoryName == 'مشاريع التخرج';
+    // 1. استخدام trim() لمنع مشاكل المسافات التي تخفي البطاقة
+    final bool isProjectsCategory = widget.categoryName.trim() == 'مشاريع التخرج';
+
+    // قراءة حالة الوضع المظلم
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       drawer: const CustomDrawer(),
-      backgroundColor: Colors.white,
+      // 2. إزالة اللون الأبيض الثابت لكي تعمل الشاشة مع الوضع المظلم
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF2E7D32)),
         title: Text(
           widget.categoryName,
-          style: const TextStyle(color: Color(0xFF2E7D32), fontWeight: FontWeight.bold),
+          // إزالة تحديد اللون هنا ليتكيف مع الثيم تلقائياً
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
       body: Column(
         children: [
-          // 1. شريط البحث
+          // شريط البحث
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
@@ -57,21 +54,18 @@ class _BooksListScreenState extends State<BooksListScreen> {
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 suffixIcon: const Icon(Icons.swap_vert, color: Color(0xFF2E7D32)),
                 filled: true,
-                fillColor: Colors.grey.shade50,
+                // تكييف لون حقل البحث مع الوضع المظلم
+                fillColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade50,
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
           ),
 
-          // 2. شريط الإحصائيات والترتيب
+          // شريط الإحصائيات والترتيب
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
@@ -81,7 +75,6 @@ class _BooksListScreenState extends State<BooksListScreen> {
                   isProjectsCategory ? 'أحدث المشاريع المضافة' : 'الكتب مرتبة (أبجدياً)',
                   style: const TextStyle(color: Colors.grey, fontSize: 13),
                 ),
-                // 🌐 [مكان ربط الـ API - PHP] : طباعة العدد الفعلي للملفات في هذا القسم
                 const Text(
                   'العدد: 24',
                   style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32)),
@@ -90,12 +83,11 @@ class _BooksListScreenState extends State<BooksListScreen> {
             ),
           ),
 
-          // 3. قائمة الملفات
+          // قائمة الملفات
           Expanded(
-            // 🌐 [مكان ربط الـ API - PHP] : استخدام FutureBuilder هنا لجلب الملفات الخاصة بهذا القسم
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: 4, // عدد وهمي مؤقت
+              itemCount: 4,
               itemBuilder: (context, index) {
 
                 // حالة قسم مشاريع التخرج
@@ -108,19 +100,38 @@ class _BooksListScreenState extends State<BooksListScreen> {
                       icon: Icons.school,
                       isGridView: false,
                       onTap: () {
-                        // فتح النافذة السفلية بدلاً من الانتقال المباشر
-                        _showProjectDetailsBottomSheet(context);
+                        // تمرير حالة الوضع المظلم للنافذة السفلية
+                        _showProjectDetailsBottomSheet(context, isDarkMode);
                       },
-                      // إخفاء زر التنزيل من البطاقة الخارجية
                       onDownload: null,
                     ),
                   );
                 }
+
                 // حالة الكتب والمراجع العادية
                 else {
-                  return _buildBookCard(
-                    title: 'عنوان الكتاب أو الملزمة رقم ${index + 1}',
-                    author: 'المؤلف: د. أحمد / م. خالد',
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: UnifiedItemCard(
+                      title: 'عنوان الكتاب أو الملزمة رقم ${index + 1}',
+                      subtitle: 'المؤلف: د. أحمد / م. خالد',
+                      icon: Icons.menu_book,
+                      isGridView: false,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PdfViewerScreen(
+                              pdfTitle: 'عنوان الكتاب أو الملزمة رقم ${index + 1}',
+                              pdfUrl: 'https://example.com/dummy.pdf',
+                            ),
+                          ),
+                        );
+                      },
+                      onDownload: () {
+                        print('تم الضغط على تنزيل الكتاب رقم ${index + 1}');
+                      },
+                    ),
                   );
                 }
               },
@@ -131,56 +142,12 @@ class _BooksListScreenState extends State<BooksListScreen> {
     );
   }
 
-  // دالة مساعدة لبناء بطاقة الكتاب بنفس تصميم (المكتبة الشاملة)
-  Widget _buildBookCard({required String title, required String author}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Text(
-            author,
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-          ),
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.download_outlined, color: Colors.grey, size: 26),
-          onPressed: () {
-            // 🌐 [مكان ربط الـ API - PHP] : كود استدعاء رابط تنزيل الملف
-            print('تم الضغط على تنزيل: $title');
-          },
-        ),
-        onTap: () {
-          // فتح الـ PDF مباشرة للقراءة
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PdfViewerScreen(
-                pdfTitle: title, // نمرر عنوان الكتاب الحالي الذي ضغط عليه المستخدم
-                pdfUrl: 'https://example.com/dummy.pdf', // 🌐 [مكان ربط الـ API] : رابط وهمي مؤقت
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  // --- دالة النافذة السفلية (Bottom Sheet) لمشاريع التخرج ---
-  void _showProjectDetailsBottomSheet(BuildContext context) {
+  // --- دالة النافذة السفلية لمشاريع التخرج (تم تكييفها للوضع المظلم) ---
+  void _showProjectDetailsBottomSheet(BuildContext context, bool isDarkMode) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -202,7 +169,7 @@ class _BooksListScreenState extends State<BooksListScreen> {
                   width: 40,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: Colors.grey.shade400,
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -214,7 +181,7 @@ class _BooksListScreenState extends State<BooksListScreen> {
                 height: 180,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(Icons.account_tree, size: 60, color: Colors.grey),
@@ -232,23 +199,22 @@ class _BooksListScreenState extends State<BooksListScreen> {
               ),
               const SizedBox(height: 8),
 
-              // 🌐 [مكان ربط الـ API - PHP] : قائمة بأسماء فريق العمل (يتم جلبها كمصفوفة List)
-              const Text(
+              Text(
                 'فريق العمل:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white : Colors.black),
               ),
               const SizedBox(height: 8),
-              // استخدام Wrap لترتيب الأسماء تلقائياً في السطور
+
               Wrap(
-                spacing: 8.0, // المسافة الأفقية بين الأسماء
-                runSpacing: 8.0, // المسافة العمودية عند النزول لسطر جديد
+                spacing: 8.0,
+                runSpacing: 8.0,
                 children: ['عمار العقبي', 'يوسف شمسان', 'هاشم العباهي'].map((studentName) {
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(20), // جعل الحواف دائرية كأنها أوسمة
-                      border: Border.all(color: Colors.grey.shade300),
+                      color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -257,7 +223,7 @@ class _BooksListScreenState extends State<BooksListScreen> {
                         const SizedBox(width: 6),
                         Text(
                           studentName,
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDarkMode ? Colors.white : Colors.black),
                         ),
                       ],
                     ),
@@ -265,21 +231,20 @@ class _BooksListScreenState extends State<BooksListScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 4),
-              Text(
+              const Text(
                 'إشراف: د. مجدي السياني',
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const Divider(height: 24),
 
-              // 🌐 [مكان ربط الـ API - PHP] : وصف المشروع
-              const Text(
+              Text(
                 'نبذة عن المشروع:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white : Colors.black),
               ),
               const SizedBox(height: 8),
-              Text(
-                'نظام متكامل يجمع بين إدارة المكتبة المادية وتوفير مصادر رقمية للطلاب، يوفر صلاحيات متعددة لتسهيل العملية التعليمية.',
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade600, height: 1.5),
+              const Text(
+                'نظام متكامل يجمع بين إدارة المكتبة المادية وتوفير مصادر رقمية للطلاب، يوفر صلاحيات متعددة لتسهيل العملية التعليمية مع وجود ميزة الاختبارات الرقمية.',
+                style: TextStyle(fontSize: 14, color: Colors.grey, height: 1.5),
               ),
               const SizedBox(height: 24),
 
@@ -289,13 +254,13 @@ class _BooksListScreenState extends State<BooksListScreen> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        Navigator.pop(context); // إغلاق النافذة السفلية أولاً
+                        Navigator.pop(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const PdfViewerScreen(
-                              pdfTitle: 'نظام إدارة مكتبة هجين', // عنوان المشروع الثابت مؤقتاً
-                              pdfUrl: 'https://example.com/dummy_project.pdf', // 🌐 [مكان ربط الـ API] : رابط وهمي مؤقت
+                              pdfTitle: 'نظام إدارة مكتبة هجين',
+                              pdfUrl: 'https://example.com/dummy_project.pdf',
                             ),
                           ),
                         );
@@ -315,7 +280,6 @@ class _BooksListScreenState extends State<BooksListScreen> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () {
-                        // 🌐 [مكان ربط الـ API - PHP] : كود استدعاء رابط تنزيل ملفات المشروع
                         print('بدء تنزيل ملفات المشروع...');
                       },
                       style: OutlinedButton.styleFrom(
