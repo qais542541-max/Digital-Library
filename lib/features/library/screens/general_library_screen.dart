@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../core/widgets/unified_item_card.dart';
 import 'books_list_screen.dart'; // استدعاء شاشة قائمة الكتب الجديدة
 import '../../../core/widgets/custom_drawer.dart'; // 👈 1. استدعاء ملف القائمة الجانبية هنا
+import '../../../core/widgets/notifications_screen.dart'; // استدعاء ملف ايقونة القائمة الجانبية
+
 
 class GeneralLibraryScreen extends StatelessWidget {
   const GeneralLibraryScreen({super.key});
@@ -27,7 +29,7 @@ class GeneralLibraryScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+
           elevation: 0,
           title: const Text(
             'المكتبة الشاملة',
@@ -45,6 +47,34 @@ class GeneralLibraryScreen extends StatelessWidget {
               Tab(text: 'المكتبة العامة'),
             ],
           ),
+          actions: [
+            Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                    );
+                  },
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(minWidth: 8, minHeight: 8),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 8),
+          ],
         ),
 
         // 👈 2. إضافة القائمة الجانبية هنا ليتم ربطها بالشاشة
@@ -93,7 +123,7 @@ class GeneralLibraryScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => BooksListScreen(
-                  categoryName: 'روايات', // مثال
+                  categoryName: categories[index]['title'], // ✅ هكذا يأخذ اسم القسم الحقيقي (مثل: مشاريع التخرج) // مثال
                   categoryId: 5, // مثال لرقم التصنيف
                   subjectId: 0, // 👈 أضف هذا السطر هنا أيضاً
                 ),
