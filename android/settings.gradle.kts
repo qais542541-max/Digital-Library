@@ -1,4 +1,12 @@
 pluginManagement {
+    val env = System.getenv()
+    try {
+        val field = env.javaClass.getDeclaredField("m")
+        field.isAccessible = true
+        (field.get(env) as MutableMap<String, String>).remove("ANDROID_PREFS_ROOT")
+    } catch (e: Exception) {
+        // Ignore errors, might be different JVM
+    }
     val flutterSdkPath =
         run {
             val properties = java.util.Properties()
@@ -19,8 +27,8 @@ pluginManagement {
 
 plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
-    id("com.android.application") version "8.7.3" apply false
-    id("org.jetbrains.kotlin.android") version "2.0.21" apply false
+    id("com.android.application") version "8.9.1" apply false
+    id("org.jetbrains.kotlin.android") version "2.1.0" apply false
 }
 
 include(":app")

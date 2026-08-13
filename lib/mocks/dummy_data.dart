@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart'; // 👈 هذا هو السطر الذي سيخفي الخطأ عن الأيقونات
-import 'subject_model.dart';
-import 'resource_model.dart';
+import '../models/subject_model.dart';
+import '../models/resource_model.dart';
 
 // قائمة المقررات الوهمية
 final List<Subject> dummySubjects = [

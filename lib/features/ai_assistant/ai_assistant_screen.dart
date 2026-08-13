@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../core/widgets/custom_drawer.dart'; // استدعاء ملف ايقونة القائمة الجانبية
 import '../../core/widgets/notifications_screen.dart'; // استدعاء ملف ايقونة القائمة الجانبية
+import '../../features/layout/screens/main_screen.dart';
+
 
 class AiAssistantScreen extends StatelessWidget {
-  const AiAssistantScreen({super.key});
+  final UserRole role; // 1. تعريف المتغير هنا
+
+  const AiAssistantScreen({super.key, required this.role}); // 2. إشراط استقباله هنا
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +84,7 @@ class AiAssistantScreen extends StatelessWidget {
           _buildInputField(isDarkMode),
         ],
       ),
-      drawer: const CustomDrawer(),
+      drawer: CustomDrawer(role: role),
     );
   }
 

@@ -1,129 +1,128 @@
 import 'package:flutter/material.dart';
-import '../../features/downloads/screens/downloads_screen.dart';
-import '../../features/favorites/screens/favorites_screen.dart';
-import '../../features/settings/screens/settings_screen.dart';
-import '../../features/about_us/about_screen.dart';
-
-const Color appPrimaryGreen = Color(0xFF2E7D32);
+import '../../features/layout/screens/main_screen.dart'; // 👈 1. استدعاء ملف الـ enum لمعرفة الصلاحية
 
 class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({super.key});
+  final UserRole role; // 👈 2. استقبال دور المستخدم
+
+  const CustomDrawer({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
-    // 1. قراءة حالة الوضع المظلم
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // تحديد بيانات رأس القائمة (Header) برمجياً حسب الدور
+    String userName = 'زائر (ضيف)';
+    String userDesc = 'تصفح المكتبة بدون حساب';
+    IconData userIcon = Icons.person_outline;
+
+    if (role == UserRole.student) {
+      userName = 'عمار العقبي'; // سيأتي من قاعدة البيانات لاحقاً
+      userDesc = 'طالب - مستوى ثالث';
+      userIcon = Icons.school;
+    } else if (role == UserRole.teacher) {
+      userName = 'د. أحمد الشيباني';
+      userDesc = 'عضو هيئة تدريس';
+      userIcon = Icons.workspace_premium;
+    } else if (role == UserRole.employee) {
+      userName = 'يوسف شمسان';
+      userDesc = 'إدارة المكتبة';
+      userIcon = Icons.admin_panel_settings;
+    } else if (role == UserRole.external) {
+      userName = 'محمد أحمد';
+      userDesc = 'باحث خارجي';
+      userIcon = Icons.person;
+    }
 
     return Drawer(
-      // 2. السحر هنا: خلفية رمادية داكنة في الوضع المظلم، وبيضاء في الفاتح
-      backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-      child: ListView(
-        padding: EdgeInsets.zero,
+      child: Column(
         children: [
-          // رأس القائمة
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              color: appPrimaryGreen,
+          // 1. رأس القائمة (Header)
+          UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(color: Color(0xFF2E7D32)),
+            accountName: Text(userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            accountEmail: Text(userDesc),
+            currentAccountPicture: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(userIcon, size: 40, color: const Color(0xFF2E7D32)),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: const [
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  radius: 30,
-                  child: Icon(Icons.local_library, size: 35, color: appPrimaryGreen),
+          ),
+
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                // 2. الملف الشخصي (يُخفى عن الضيف فقط)
+                if (role != UserRole.guest)
+                  ListTile(
+                    leading: const Icon(Icons.person),
+                    title: const Text('الملف الشخصي'),
+                    onTap: () {
+                      // الانتقال لشاشة الملف الشخصي
+                    },
+                  ),
+
+                // 3. ملفاتي / تنزيلاتي (تُخفى عن الضيف وعن الموظف)
+                if (role != UserRole.guest && role != UserRole.employee)
+                  ListTile(
+                    leading: const Icon(Icons.folder),
+                    title: const Text('ملفاتي وتنزيلاتي'),
+                    onTap: () {
+                      // الانتقال لشاشة الملفات
+                    },
+                  ),
+
+                // 4. المفضلة (تظهر للجميع، ولكن للضيف نبرمجها لتعرض رسالة طلب تسجيل دخول)
+                ListTile(
+                  leading: const Icon(Icons.favorite_border),
+                  title: const Text('المفضلة'),
+                  onTap: () {
+                    if (role == UserRole.guest) {
+                      Navigator.pop(context); // إغلاق القائمة
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('يرجى تسجيل الدخول أو إنشاء حساب لحفظ مفضلاتك!'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                    } else {
+                      // الانتقال لشاشة المفضلة
+                    }
+                  },
                 ),
-                SizedBox(height: 12),
-                Text(
-                  'المكتبة الشاملة',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+
+                const Divider(),
+
+                // 5. الإعدادات العامة (تظهر للجميع)
+                ListTile(
+                  leading: const Icon(Icons.settings),
+                  title: const Text('الإعدادات'),
+                  onTap: () {
+                    // الانتقال لشاشة الإعدادات
+                  },
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 10),
-
-          // تمرير حالة الثيم (isDarkMode) لكل زر ليتكيف لونه
-          _buildDrawerItem(
-            context: context,
-            title: 'مفضلاتي',
-            icon: Icons.favorite_border,
-            isDarkMode: isDarkMode,
+          // 6. زر تسجيل الدخول / الخروج الذكي
+          const Divider(height: 1),
+          ListTile(
+            leading: Icon(
+              role == UserRole.guest ? Icons.login : Icons.logout,
+              color: role == UserRole.guest ? const Color(0xFF2E7D32) : Colors.red,
+            ),
+            title: Text(
+              role == UserRole.guest ? 'تسجيل الدخول / إنشاء حساب' : 'تسجيل الخروج',
+              style: TextStyle(
+                color: role == UserRole.guest ? const Color(0xFF2E7D32) : Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const FavoritesScreen()));
+              // توجيه المستخدم لشاشة تسجيل الدخول الرئيسية
             },
           ),
-
-          const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
-
-          _buildDrawerItem(
-            context: context,
-            title: 'تحميلاتي',
-            icon: Icons.file_download_outlined,
-            isDarkMode: isDarkMode,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const DownloadsScreen()));
-            },
-          ),
-
-          const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
-
-          _buildDrawerItem(
-            context: context,
-            title: 'إعدادات',
-            icon: Icons.settings_outlined,
-            isDarkMode: isDarkMode,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
-            },
-          ),
-
-          const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
-
-          _buildDrawerItem(
-            context: context,
-            title: 'من نحن',
-            icon: Icons.info_outline,
-            isDarkMode: isDarkMode,
-            onTap: () {
-              Navigator.pop(context); // إغلاق القائمة الجانبية
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AboutScreen()), // الانتقال لصفحة من نحن
-              );
-            },
-          ),
+          const SizedBox(height: 16),
         ],
       ),
-    );
-  }
-
-  // 3. دالة بناء الأزرار أصبحت ذكية الآن
-  Widget _buildDrawerItem({
-    required BuildContext context,
-    required String title,
-    required IconData icon,
-    required bool isDarkMode,
-    required VoidCallback onTap
-  }) {
-    return ListTile(
-      // الأيقونة بيضاء باهتة في المظلم، وسوداء في الفاتح
-      leading: Icon(icon, color: isDarkMode ? Colors.white70 : Colors.black87, size: 28),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          // النص أبيض في المظلم، وأسود في الفاتح ليكون واضحاً دائماً
-          color: isDarkMode ? Colors.white : Colors.black87,
-        ),
-      ),
-      onTap: onTap,
     );
   }
 }

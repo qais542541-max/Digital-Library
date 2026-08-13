@@ -15,21 +15,32 @@ class UnifiedItemCard extends StatelessWidget {
     required this.icon,
     required this.isGridView,
     this.onTap,
-    this.onDownload, // أضفناه هنا
+    this.onDownload,
   });
 
   @override
   Widget build(BuildContext context) {
+    // 1. هذا السطر يسأل التطبيق: هل نحن في الوضع المظلم الآن؟
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     // استخدمنا InkWell ليعطي تأثيراً بصرياً (تموج) عند الضغط على البطاقة
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(15), // ليكون تأثير الضغط متناسقاً مع الحواف
+      borderRadius: BorderRadius.circular(15),
       child: Card(
-        color: Colors.white,
+        // 2. السحر هنا: إذا كان مظلماً نجعله رمادياً داكناً، وإلا نجعله أبيض
+        color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
         elevation: 4,
-        shadowColor: Colors.grey.withOpacity(0.4),
+
+        // 3. نخفي الظل في الوضع المظلم ليكون التصميم أنظف
+        shadowColor: isDarkMode ? Colors.transparent : Colors.grey.withOpacity(0.4),
+
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: Colors.grey.shade100, width: 1),
+          // 4. نخفي الحدود البيضاء في الوضع المظلم
+          side: BorderSide(
+              color: isDarkMode ? Colors.transparent : Colors.grey.shade100,
+              width: 1
+          ),
           borderRadius: BorderRadius.circular(15),
         ),
         child: isGridView
@@ -41,6 +52,7 @@ class UnifiedItemCard extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
+              // لم نحدد لون النص هنا لكي يأخذ اللون الأبيض تلقائياً في الوضع المظلم
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             Text(
@@ -54,10 +66,13 @@ class UnifiedItemCard extends StatelessWidget {
           leading: Icon(icon, color: const Color(0xFF2E7D32), size: 40),
           title: Text(
             title,
+            // لم نحدد لون النص هنا أيضاً
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
-          subtitle: Text(subtitle),
-          // السحر هنا: إذا تم تمرير أمر التنزيل نظهر الزر، وإلا نظهر السهم
+          subtitle: Text(
+            subtitle,
+            style: const TextStyle(color: Colors.grey),
+          ),
           trailing: onDownload != null
               ? IconButton(
             icon: const Icon(Icons.download_rounded, color: Color(0xFF2E7D32)),
