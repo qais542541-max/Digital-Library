@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../downloads/screens/downloads_screen.dart';
+import '../../layout/screens/main_screen.dart'; // 👈 استدعاء ملف الصلاحيات
 import 'change_password_screen.dart';
 import 'profile_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+  final UserRole role; // 👈 1. استقبال دور المستخدم
+
+  const SettingsScreen({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +17,6 @@ class SettingsScreen extends StatelessWidget {
 
     final settings = Provider.of<SettingsProvider>(context);
     final isDarkMode = settings.isDarkMode;
-
 
     return Scaffold(
       appBar: AppBar(
@@ -24,38 +26,41 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         children: [
-          _buildSectionHeader('الحساب', primaryGreen),
-          _buildListTile(
-            Icons.person_outline,
-            'الملف الشخصي',
-            'تعديل بيانات الطالب',
-                () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()), // ضَع اسم شاشتك هنا
-              );
-            },
-            iconColor: isDarkMode ? Colors.white : Colors.black87,
-            textColor: isDarkMode ? Colors.white : Colors.black87,
-          ),
-          _buildListTile(
-            Icons.lock_outline,
-            'تغيير كلمة المرور',
-            '',
-                () {
-              showChangePasswordDialog(context, isDarkMode); // استدعاء نظيف ومباشر!
-            },
-            iconColor: isDarkMode ? Colors.white : Colors.black87,
-            textColor: isDarkMode ? Colors.white : Colors.black87,
-          ),
-          const Divider(height: 30, indent: 20, endIndent: 20),
+          // 👇 2. إخفاء قسم الحساب بالكامل إذا كان المستخدم ضيفاً 👇
+          if (role != UserRole.guest) ...[
+            _buildSectionHeader('الحساب', primaryGreen),
+            _buildListTile(
+              Icons.person_outline,
+              'الملف الشخصي',
+              'تعديل بيانات الطالب',
+                  () {
+                Navigator.push(
+                  context,
+                  // تمرير الصلاحية لشاشة الملف الشخصي أيضاً
+                  MaterialPageRoute(builder: (context) => ProfileScreen(role: role)),
+                );
+              },
+              iconColor: isDarkMode ? Colors.white : Colors.black87,
+              textColor: isDarkMode ? Colors.white : Colors.black87,
+            ),
+            _buildListTile(
+              Icons.lock_outline,
+              'تغيير كلمة المرور',
+              '',
+                  () {
+                showChangePasswordDialog(context, isDarkMode);
+              },
+              iconColor: isDarkMode ? Colors.white : Colors.black87,
+              textColor: isDarkMode ? Colors.white : Colors.black87,
+            ),
+            const Divider(height: 30, indent: 20, endIndent: 20),
+          ],
 
           _buildSectionHeader('التفضيلات والإشعارات', primaryGreen),
 
           _buildListTile(
             Icons.language,
             'لغة التطبيق',
-            // 👇 هنا جعلناه يتغير تلقائياً بناءً على ما اختاره الطالب
             settings.languageCode == 'ar' ? 'العربية' : 'English',
                 () {
               _showLanguageDialog(context, primaryGreen, isDarkMode, settings);
@@ -101,18 +106,24 @@ class SettingsScreen extends StatelessWidget {
 
           const Divider(height: 30, indent: 20, endIndent: 20),
 
-          _buildSectionHeader('التخزين والبيانات', primaryGreen),
+          // 👇 3. إخفاء إدارة التحميلات عن الضيف والموظف 👇
+          if (role != UserRole.guest && role != UserRole.employee) ...[
+            _buildSectionHeader('التخزين والبيانات', primaryGreen),
+            _buildListTile(
+              Icons.folder_outlined, 'إدارة التحميلات', 'عرض وحذف الملفات المحملة', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const DownloadsScreen()),
+              );
+            },
+              iconColor: isDarkMode ? Colors.white : Colors.black87,
+              textColor: isDarkMode ? Colors.white : Colors.black87,
+            ),
+          ],
 
-          _buildListTile(
-            Icons.folder_outlined, 'إدارة التحميلات', 'عرض وحذف الملفات المحملة', () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DownloadsScreen()),
-            );
-          },
-            iconColor: isDarkMode ? Colors.white : Colors.black87,
-            textColor: isDarkMode ? Colors.white : Colors.black87,
-          ),
+          // مسح الذاكرة المؤقتة يظهر للجميع
+          if (role == UserRole.guest || role == UserRole.employee)
+            _buildSectionHeader('التخزين والبيانات', primaryGreen),
 
           _buildListTile(
             Icons.delete_outline, 'مسح الذاكرة المؤقتة (Cache)', 'توفير مساحة التخزين في الهاتف', () {
@@ -134,14 +145,20 @@ class SettingsScreen extends StatelessWidget {
             iconColor: isDarkMode ? Colors.white : Colors.black87,
             textColor: isDarkMode ? Colors.white : Colors.black87,
           ),
+
+          // 👇 4. زر ذكي لتسجيل الدخول / الخروج 👇
           _buildListTile(
-            Icons.logout, 'تسجيل الخروج', '', () {},
-            iconColor: Colors.red,
-            textColor: Colors.red,
+            role == UserRole.guest ? Icons.login : Icons.logout,
+            role == UserRole.guest ? 'تسجيل الدخول' : 'تسجيل الخروج',
+            '',
+                () {
+              // TODO: مسار العودة لشاشة تسجيل الدخول
+            },
+            iconColor: role == UserRole.guest ? primaryGreen : Colors.red,
+            textColor: role == UserRole.guest ? primaryGreen : Colors.red,
           ),
         ],
       ),
-
     );
   }
 
@@ -162,7 +179,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // 👈 2. هنا قمنا باستقبال settings كـ Parameter لتتمكن الدالة من استخدامه
   void _showLanguageDialog(BuildContext context, Color primaryGreen, bool isDarkMode, SettingsProvider settings) {
     showDialog(
       context: context,
@@ -179,7 +195,7 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           content: RadioGroup<String>(
-            groupValue: settings.languageCode, // الآن سيتعرف على settings بدون أي مشاكل
+            groupValue: settings.languageCode,
             onChanged: (String? value) {
               if (value != null) {
                 settings.changeLanguage(value);

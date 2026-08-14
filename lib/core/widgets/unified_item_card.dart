@@ -5,8 +5,8 @@ class UnifiedItemCard extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final bool isGridView;
-  final VoidCallback? onTap; // أمر الضغط على البطاقة لفتحها
-  final VoidCallback? onDownload; // أمر الضغط على زر التنزيل (اختياري)
+  final VoidCallback? onTap;
+  final VoidCallback? onDownload;
 
   const UnifiedItemCard({
     super.key,
@@ -20,28 +20,27 @@ class UnifiedItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. هذا السطر يسأل التطبيق: هل نحن في الوضع المظلم الآن؟
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    // استخدمنا InkWell ليعطي تأثيراً بصرياً (تموج) عند الضغط على البطاقة
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(15),
-      child: Card(
-        // 2. السحر هنا: إذا كان مظلماً نجعله رمادياً داكناً، وإلا نجعله أبيض
-        color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
-        elevation: 4,
-
-        // 3. نخفي الظل في الوضع المظلم ليكون التصميم أنظف
-        shadowColor: isDarkMode ? Colors.transparent : Colors.grey.withOpacity(0.4),
-
-        shape: RoundedRectangleBorder(
-          // 4. نخفي الحدود البيضاء في الوضع المظلم
-          side: BorderSide(
-              color: isDarkMode ? Colors.transparent : Colors.grey.shade100,
+      child: Container(
+        // 👇 السحر هنا: توحيد التصميم والظلال مع شاشة الرئيسية (Jaib Style)
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white, // نفس لون حاويات الرئيسية
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+              color: isDarkMode ? Colors.transparent : Colors.grey.shade200,
               width: 1
           ),
-          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.04), // ظل خفيف للعمق
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: isGridView
             ? Column(
@@ -52,7 +51,6 @@ class UnifiedItemCard extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              // لم نحدد لون النص هنا لكي يأخذ اللون الأبيض تلقائياً في الوضع المظلم
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             Text(
@@ -66,7 +64,6 @@ class UnifiedItemCard extends StatelessWidget {
           leading: Icon(icon, color: const Color(0xFF2E7D32), size: 40),
           title: Text(
             title,
-            // لم نحدد لون النص هنا أيضاً
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           subtitle: Text(

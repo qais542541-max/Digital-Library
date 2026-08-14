@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/providers/settings_provider.dart';
-import '../../../core/widgets/unified_item_card.dart';
-import '../../../core/widgets/notifications_screen.dart'; // مسار شاشة الإشعارات
+import 'package:digital_library/core/providers/settings_provider.dart';
+import 'package:digital_library/core/widgets/unified_item_card.dart';
+import 'package:digital_library/core/widgets/notifications_screen.dart';
 
 class GeneralMainScreen extends StatelessWidget {
-  final String userName; // 👈 متغير لاستقبال الاسم
-  final String userRole; // 👈 متغير لاستقبال الصفة
+  final String userName;
+  final String userRole;
 
   const GeneralMainScreen({
     super.key,
@@ -16,7 +16,6 @@ class GeneralMainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ... (باقي الكود كما هو)
     const Color primaryGreen = Color(0xFF2E7D32);
     final settings = Provider.of<SettingsProvider>(context);
     final isDarkMode = settings.isDarkMode;
@@ -24,6 +23,8 @@ class GeneralMainScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.grey.shade50,
+
+      // الترويسة المسطحة (نمط المكتبة الشاملة)
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -36,7 +37,6 @@ class GeneralMainScreen extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
-          // زر الإشعارات مع العداد (Badge)
           Stack(
             children: [
               IconButton(
@@ -68,6 +68,7 @@ class GeneralMainScreen extends StatelessWidget {
           const SizedBox(width: 8),
         ],
       ),
+
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +89,7 @@ class GeneralMainScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    isArabic ? 'الصفة: $userRole' : 'Role: $userRole', // 👈 استخدمنا الصفة هنا أيضاً
+                    isArabic ? 'الصفة: $userRole' : 'Role: $userRole',
                     style: TextStyle(
                       fontSize: 14,
                       color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
@@ -103,6 +104,7 @@ class GeneralMainScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
+
                   // شريط البحث
                   Container(
                     decoration: BoxDecoration(
@@ -132,17 +134,31 @@ class GeneralMainScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // 2. الوصول السريع (Quick Actions)
+            // 2. الوصول السريع المجمع (نمط تطبيق جيب - البطاقة البارزة)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildQuickAction(Icons.video_library, isArabic ? 'المحاضرات' : 'Lectures', primaryGreen, isDarkMode),
-                  _buildQuickAction(Icons.architecture, isArabic ? 'المشاريع' : 'Projects', primaryGreen, isDarkMode),
-                  _buildQuickAction(Icons.menu_book, isArabic ? 'الكتب الورقية' : 'Books', primaryGreen, isDarkMode),
-                  _buildQuickAction(Icons.article_outlined, isArabic ? 'الإعلانات' : 'News', primaryGreen, isDarkMode),
-                ],
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.04),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildFlatQuickAction(Icons.video_library, isArabic ? 'المحاضرات' : 'Lectures', primaryGreen, isDarkMode),
+                    _buildFlatQuickAction(Icons.architecture, isArabic ? 'المشاريع' : 'Projects', primaryGreen, isDarkMode),
+                    _buildFlatQuickAction(Icons.menu_book, isArabic ? 'الكتب' : 'Books', primaryGreen, isDarkMode),
+                    _buildFlatQuickAction(Icons.article_outlined, isArabic ? 'الإعلانات' : 'News', primaryGreen, isDarkMode),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 25),
@@ -163,7 +179,7 @@ class GeneralMainScreen extends StatelessWidget {
                       title: isArabic ? 'ملزمة برمجة متقدمة' : 'Advanced Programming',
                       subtitle: 'د. أحمد محمد',
                       icon: Icons.picture_as_pdf,
-                      isGridView: true, // شكل شبكي للبطاقات الأفقية
+                      isGridView: true,
                       onTap: () {},
                       onDownload: () {},
                     ),
@@ -214,7 +230,7 @@ class GeneralMainScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                isArabic ? 'تم تحديد موعد مناقشة مشاريع التخرج لقسم البرمجة...' : 'The date for the projects defense has been set...',
+                                isArabic ? 'تم تحديد موعد مناقشة مشاريع التخرج...' : 'The date for the projects defense has been set...',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
@@ -253,24 +269,17 @@ class GeneralMainScreen extends StatelessWidget {
     );
   }
 
-  // دالة مساعدة لبناء أزرار الوصول السريع
-  Widget _buildQuickAction(IconData icon, String label, Color color, bool isDarkMode) {
+  // الدالة المحدثة لبناء الأزرار المسطحة داخل الحاوية المجمعة
+  Widget _buildFlatQuickAction(IconData icon, String label, Color color, bool isDarkMode) {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+            color: color.withOpacity(0.1), // لون شفاف لتمييز الأيقونة
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
           ),
-          child: Icon(icon, color: color, size: 26),
+          child: Icon(icon, color: color, size: 28),
         ),
         const SizedBox(height: 8),
         Text(

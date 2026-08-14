@@ -1,90 +1,114 @@
 import 'package:flutter/material.dart';
+import '../../home//screens/general_main_screen.dart';
 import '../../courses/screens/my_courses_screen.dart';
 import '../../library/screens/general_library_screen.dart';
-import '../../ai_assistant/ai_assistant_screen.dart';
-import '../../home/screens/general_main_screen.dart';
 import '../../../core/widgets/custom_drawer.dart';
+import '../../ai_assistant/ai_assistant_screen.dart';
 
-// 1. تعريف الأدوار بوضوح تام (يمكنك وضع هذا الـ enum في ملف منفصل لاحقاً لترتيب أفضل)
-// تعريف الأدوار ليطابق قاعدة البيانات تماماً
-enum UserRole {
-  student,   // يطابق library_members -> student
-  teacher,   // يطابق library_members -> teacher
-  employee,  // يطابق users -> employees
-  external,  // يطابق library_members -> external (ضيف مسجل)
-  guest      // مستخدم بدون حساب إطلاقاً
-}
+enum UserRole { student, teacher, employee, guest, external }
 
 class MainScreen extends StatefulWidget {
-  final UserRole role; // نستقبل دور المستخدم هنا
+  final UserRole role;
+  final String userName;
 
-  const MainScreen({super.key, required this.role});
+  const MainScreen({
+    super.key,
+    required this.role,
+    required this.userName,
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
+  int _selectedIndex = 0;
+  late List<Widget> _screens;
 
-  // 2. دالة ذكية تحدد الشاشات المسموحة بناءً على الدور
-  List<Widget> _getScreens() {
-    List<Widget> screens = [];
-
-    // الجميع يرى الشاشة الرئيسية المشتركة (مع تغيير الاسم والصفة لاحقاً برمجياً)
-    screens.add(const GeneralMainScreen(
-      userName: 'مرحباً بك', // سيتم جلبها من قاعدة البيانات لاحقاً
-      userRole: 'النظام الأكاديمي',
-    ));
-
-    // شاشة "مقرراتي" تظهر للطالب والمعلم فقط (لا تظهر للموظف الإداري أو الضيف)
-    if (widget.role == UserRole.student || widget.role == UserRole.teacher) {
-      screens.add(MyCoursesScreen(role: widget.role)); // نمرر الدور للشاشة
-    }
-
-    // الجميع يرى المكتبة، ونمرر لها الدور لتتحكم بظهور زر الرفع
-    screens.add(GeneralLibraryScreen(role: widget.role));
-
-    // الجميع يرى المساعد الذكي
-    screens.add(AiAssistantScreen(role: widget.role)); // لاحظ حذفنا كلمة const ومررنا المتغير
-    return screens;
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      GeneralMainScreen(
+        userName: widget.userName,
+        userRole: _getRoleName(widget.role),
+      ),
+      MyCoursesScreen(role: widget.role),
+      GeneralLibraryScreen(role: widget.role),
+      AiAssistantScreen(role: widget.role), // 👈 إضافة الشاشة هنا
+    ];
   }
 
-  // 3. دالة ذكية تحدد أزرار القائمة السفلية بناءً على الدور
-  List<BottomNavigationBarItem> _getBottomNavItems() {
-    List<BottomNavigationBarItem> items = [
-      const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'الرئيسية'),
-    ];
-
-    if (widget.role == UserRole.student || widget.role == UserRole.teacher) {
-      items.add(const BottomNavigationBarItem(icon: Icon(Icons.book), label: 'مقرراتي'));
+  String _getRoleName(UserRole role) {
+    switch (role) {
+      case UserRole.student: return 'طالب';
+      case UserRole.teacher: return 'معلم';
+      case UserRole.employee: return 'موظف';
+      case UserRole.external: return 'باحث خارجي';
+      case UserRole.guest: return 'ضيف';
     }
-
-    items.add(const BottomNavigationBarItem(icon: Icon(Icons.local_library), label: 'المكتبة'));
-    items.add(const BottomNavigationBarItem(icon: Icon(Icons.auto_awesome), label: 'المساعد'));
-
-    return items;
   }
 
   @override
   Widget build(BuildContext context) {
-    final screens = _getScreens();
-    final navItems = _getBottomNavItems();
-
-    // حماية لتجنب أخطاء الفهرس إذا تغير عدد الشاشات
-    if (_currentIndex >= screens.length) {
-      _currentIndex = 0;
-    }
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    const Color primaryGreen = Color(0xFF2E7D32);
 
     return Scaffold(
-      drawer: CustomDrawer(role: widget.role),      body: screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF2E7D32),
-        unselectedItemColor: Colors.grey,
-        items: navItems,
+      drawer: CustomDrawer(role: widget.role),
+
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _screens,
+      ),
+
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+          selectedItemColor: primaryGreen,
+          unselectedItemColor: Colors.grey,
+          showUnselectedLabels: true,
+          type: BottomNavigationBarType.fixed, // إبقاء الأيقونات ثابتة عند زيادة عددها
+          elevation: 0,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'الرئيسية',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.school_outlined),
+              activeIcon: Icon(Icons.school),
+              label: 'مقرراتي',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.local_library_outlined),
+              activeIcon: Icon(Icons.local_library),
+              label: 'المكتبة',
+            ),
+            // 👇 إضافة أيقونة المساعد الذكي
+            BottomNavigationBarItem(
+              icon: Icon(Icons.smart_toy_outlined),
+              activeIcon: Icon(Icons.smart_toy),
+              label: 'المساعد',
+            ),
+          ],
+        ),
       ),
     );
   }

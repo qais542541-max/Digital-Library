@@ -46,9 +46,12 @@ class DigitalLibraryApp extends StatelessWidget {
       themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
 
       // -- إعدادات الوضع الفاتح (التي برمجناها سابقاً) --
+      // -- إعدادات الوضع الفاتح --
       theme: ThemeData(
         brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.grey.shade50, // 👈 1. توحيد لون الخلفية الفاتح
         appBarTheme: const AppBarTheme(
+          // ... باقي الكود
           iconTheme: IconThemeData(color: appPrimaryGreen),
           backgroundColor: Colors.white,
           elevation: 0,
@@ -61,9 +64,12 @@ class DigitalLibraryApp extends StatelessWidget {
       ),
 
       // -- إعدادات الوضع المظلم (الجديدة) --
+      // -- إعدادات الوضع المظلم --
       darkTheme: ThemeData(
         brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF121212), // 👈 2. توحيد لون الخلفية المظلم
         appBarTheme: const AppBarTheme(
+          // ... باقي الكود
           iconTheme: IconThemeData(color: appPrimaryGreen),
           backgroundColor: Color(0xFF1E1E1E), // لون رمادي غامق أنيق
           elevation: 0,
@@ -73,7 +79,6 @@ class DigitalLibraryApp extends StatelessWidget {
           labelColor: appPrimaryGreen,
           indicatorColor: appPrimaryGreen,
         ),
-        scaffoldBackgroundColor: const Color(0xFF121212), // لون خلفية التطبيق المظلم
       ),
 
       home: const LoginScreen(),

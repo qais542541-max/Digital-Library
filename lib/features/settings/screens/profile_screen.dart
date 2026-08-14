@@ -3,25 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/providers/settings_provider.dart';
+import '../../layout/screens/main_screen.dart'; // 👈 استدعاء ملف الصلاحيات (تأكد من المسار لديك)
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final UserRole role; // 👈 إضافة متغير الصلاحية لاستقبال دور المستخدم
+
+  const ProfileScreen({super.key, required this.role});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // متحكمات النصوص
+  // متحكمات النصوص (سيتم تعبئتها لاحقاً من قاعدة البيانات حسب المستخدم)
   final TextEditingController _nameController = TextEditingController(text: 'عمار العقبي');
   final TextEditingController _emailController = TextEditingController(text: 'ammar@scc.edu.ye');
   final TextEditingController _phoneController = TextEditingController(text: '+967 77X XXX XXX');
 
-  // متغيرات الصورة
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
 
-  // دالة اختيار الصورة من المعرض فقط
   Future<void> _pickImage() async {
     try {
       final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -50,6 +51,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final isDarkMode = settings.isDarkMode;
     final isArabic = settings.languageCode == 'ar';
 
+    // 👇 تحديد مسمى الرقم الثابت حسب الصلاحية
+    final String idLabel = widget.role == UserRole.student
+        ? (isArabic ? 'الرقم الجامعي' : 'Student ID')
+        : (isArabic ? 'الرقم الوظيفي' : 'Employee ID');
+
+    final String idValue = widget.role == UserRole.student ? '20241050' : '900125';
+
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.grey.shade50,
       appBar: AppBar(
@@ -62,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            // 1. صورة الطالب مع زر التعديل
+            // 1. صورة المستخدم
             Center(
               child: Stack(
                 children: [
@@ -83,7 +91,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    // تظهر الأيقونة فقط إذا لم تكن هناك صورة محددة ولم تكن الصورة الافتراضية موجودة
                     child: _imageFile == null
                         ? const Icon(Icons.person, size: 60, color: Colors.grey)
                         : null,
@@ -92,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     bottom: 0,
                     right: 0,
                     child: GestureDetector(
-                      onTap: _pickImage, // استدعاء دالة اختيار الصورة
+                      onTap: _pickImage,
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: const BoxDecoration(
@@ -108,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 30),
 
-            // 2. البيانات الأكاديمية (مختلطة: ثابتة وقابلة للتعديل)
+            // 2. البيانات الأكاديمية / الوظيفية (تتغير حسب الدور)
             Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
@@ -118,40 +125,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: Column(
                 children: [
-                  _buildReadOnlyInfo(Icons.badge, isArabic ? 'الرقم الجامعي' : 'Student ID', '20241050', isDarkMode),
-                  const Divider(height: 20),
-                  _buildReadOnlyInfo(Icons.computer, isArabic ? 'التخصص' : 'Major', isArabic ? 'برمجة حاسوب' : 'Computer Programming', isDarkMode),
-                  const Divider(height: 20),
+                  // هذا الحقل يظهر للجميع (لكن مسماه يتغير: رقم جامعي أو وظيفي)
+                  _buildReadOnlyInfo(Icons.badge, idLabel, idValue, isDarkMode),
 
-                  // 👇 قائمة منسدلة لتعديل المستوى (السنة)
-                  _buildDropdownRow(
-                    icon: Icons.school,
-                    title: isArabic ? 'المستوى الدراسي' : 'Academic Year',
-                    currentValue: settings.academicYear,
-                    items: ['السنة الأولى', 'السنة الثانية', 'السنة الثالثة', 'السنة الرابعة'],
-                    onChanged: (val) => settings.changeAcademicYear(val!),
-                    isDarkMode: isDarkMode,
-                  ),
-                  const Divider(height: 20),
-
-                  // 👇 قائمة منسدلة لتعديل الترم
-                  _buildDropdownRow(
-                    icon: Icons.calendar_month,
-                    title: isArabic ? 'الترم الحالي' : 'Current Term',
-                    currentValue: settings.academicTermIndex == 0 ? 'الترم الأول' : 'الترم الثاني',
-                    items: ['الترم الأول', 'الترم الثاني'],
-                    onChanged: (val) {
-                      int index = val == 'الترم الأول' ? 0 : 1;
-                      settings.changeAcademicTerm(index);
-                    },
-                    isDarkMode: isDarkMode,
-                  ),
+                  // 👇 هذه الحقول تظهر للطالب فــــــــــقــــــــــط 👇
+                  if (widget.role == UserRole.student) ...[
+                    const Divider(height: 20),
+                    _buildReadOnlyInfo(Icons.computer, isArabic ? 'التخصص' : 'Major', isArabic ? 'برمجة حاسوب' : 'Computer Programming', isDarkMode),
+                    const Divider(height: 20),
+                    _buildDropdownRow(
+                      icon: Icons.school,
+                      title: isArabic ? 'المستوى الدراسي' : 'Academic Year',
+                      currentValue: settings.academicYear,
+                      items: ['السنة الأولى', 'السنة الثانية', 'السنة الثالثة', 'السنة الرابعة'],
+                      onChanged: (val) => settings.changeAcademicYear(val!),
+                      isDarkMode: isDarkMode,
+                    ),
+                    const Divider(height: 20),
+                    _buildDropdownRow(
+                      icon: Icons.calendar_month,
+                      title: isArabic ? 'الترم الحالي' : 'Current Term',
+                      currentValue: settings.academicTermIndex == 0 ? 'الترم الأول' : 'الترم الثاني',
+                      items: ['الترم الأول', 'الترم الثاني'],
+                      onChanged: (val) {
+                        int index = val == 'الترم الأول' ? 0 : 1;
+                        settings.changeAcademicTerm(index);
+                      },
+                      isDarkMode: isDarkMode,
+                    ),
+                  ],
                 ],
               ),
             ),
             const SizedBox(height: 25),
 
-            // 3. البيانات الشخصية (نصوص قابلة للتعديل)
+            // 3. البيانات الشخصية المتاحة للجميع للتعديل
             _buildEditableField(isArabic ? 'الاسم الكامل' : 'Full Name', Icons.person_outline, _nameController, isDarkMode),
             const SizedBox(height: 16),
             _buildEditableField(isArabic ? 'البريد الإلكتروني' : 'Email', Icons.email_outlined, _emailController, isDarkMode, isEmail: true),
@@ -192,7 +200,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // دالة مساعدة للمعلومات الثابتة
   Widget _buildReadOnlyInfo(IconData icon, String title, String value, bool isDarkMode) {
     return Row(
       children: [
@@ -213,7 +220,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // دالة مساعدة لإنشاء قوائم المستوى والترم المنسدلة
   Widget _buildDropdownRow({required IconData icon, required String title, required String currentValue, required List<String> items, required Function(String?) onChanged, required bool isDarkMode}) {
     return Row(
       children: [
@@ -234,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: isDarkMode ? Colors.white : Colors.black87,
-                    fontFamily: 'Cairo', // تأكد من استخدام خطك المفضل
+                    fontFamily: 'Cairo',
                   ),
                   icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF2E7D32)),
                   items: items.map((String item) {
@@ -253,7 +259,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // دالة مساعدة للحقول النصية
   Widget _buildEditableField(String label, IconData icon, TextEditingController controller, bool isDarkMode, {bool isEmail = false, bool isPhone = false}) {
     return TextField(
       controller: controller,

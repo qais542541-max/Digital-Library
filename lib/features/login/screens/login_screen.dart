@@ -8,12 +8,34 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    // دالة التوجيه السريع بناءً على الصلاحية
+    // 👇 التعديل هنا: دالة التوجيه السريع لتشمل اسم المستخدم بناءً على الصلاحية
     void loginAs(UserRole role) {
+      String mockUserName = '';
+
+      // تحديد اسم افتراضي للتجربة حسب الدور الذي تم اختياره
+      switch (role) {
+        case UserRole.student:
+          mockUserName = 'عمار العقبي'; // تم تحديد اسم الطالب
+          break;
+        case UserRole.teacher:
+          mockUserName = 'د. أحمد الشيباني';
+          break;
+        case UserRole.employee:
+          mockUserName = 'يوسف شمسان';
+          break;
+        case UserRole.external:
+          mockUserName = 'محمد أحمد';
+          break;
+        case UserRole.guest:
+          mockUserName = 'زائر (ضيف)';
+          break;
+      }
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MainScreen(role: role),
+          // 👈 تمرير الصلاحية والاسم معاً لحل الخطأ
+          builder: (context) => MainScreen(role: role, userName: mockUserName),
         ),
       );
     }
