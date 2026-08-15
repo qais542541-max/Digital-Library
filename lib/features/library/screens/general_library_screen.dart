@@ -18,7 +18,6 @@ class GeneralLibraryScreen extends StatelessWidget {
     final isArabic = settings.languageCode == 'ar';
     const Color primaryGreen = Color(0xFF2E7D32);
 
-    // قوائم الأقسام
     final List<Map<String, dynamic>> collegeLibraryCategories = [
       {'title': 'مشاريع التخرج', 'icon': Icons.account_tree, 'subtitle': 'أرشيف مشاريع الدفع السابقة'},
       // ... باقي الأقسام
@@ -31,33 +30,27 @@ class GeneralLibraryScreen extends StatelessWidget {
 
     return DefaultTabController(
       length: 2,
-      child: SafeArea( // لضمان عدم تداخل الترويسة مع شريط حالة الهاتف
+      child: SafeArea(
         child: Column(
           children: [
-            // 👇 1. ترويسة الشاملة المخصصة (نص ثابت في المنتصف بدلاً من القائمة المنسدلة) 👇
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // زر القائمة الجانبية
                   IconButton(
                     icon: Icon(Icons.menu, color: isDarkMode ? Colors.white : Colors.black87),
                     onPressed: () => Scaffold.of(context).openDrawer(),
                   ),
-
-                  // النص الثابت
                   Text(
                     isArabic ? 'المكتبة العامة' : 'General Library',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: isDarkMode ? Colors.white : primaryGreen,
-                      fontFamily: 'Cairo', // للحصول على مظهر أنيق للنص
+                      fontFamily: 'Cairo',
                     ),
                   ),
-
-                  // زر الإشعارات
                   IconButton(
                     icon: Icon(Icons.notifications_outlined, color: isDarkMode ? Colors.white : Colors.black87),
                     onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen())),
@@ -66,14 +59,12 @@ class GeneralLibraryScreen extends StatelessWidget {
               ),
             ),
 
-            // 👇 2. شريط البحث المتقدم (Shamela Style) 👇
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
               child: Row(
                 children: [
-                  // زر البحث المتقدم (منفصل)
                   Container(
-                    height: 45, // نفس ارتفاع شريط البحث
+                    height: 45,
                     width: 45,
                     decoration: BoxDecoration(
                       color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
@@ -82,17 +73,13 @@ class GeneralLibraryScreen extends StatelessWidget {
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.tune, color: primaryGreen, size: 20),
-                      onPressed: () {
-                        // TODO: إظهار نافذة البحث المتقدم
-                      },
+                      onPressed: () {},
                     ),
                   ),
-                  const SizedBox(width: 10), // مسافة بين الزر وشريط البحث
-
-                  // شريط البحث الأساسي
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Container(
-                      height: 45, // 👈 تحديد ارتفاع نحيف للشريط
+                      height: 45,
                       decoration: BoxDecoration(
                         color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
                         borderRadius: BorderRadius.circular(12),
@@ -103,9 +90,9 @@ class GeneralLibraryScreen extends StatelessWidget {
                         decoration: InputDecoration(
                           hintText: isArabic ? 'ابحث عن مقرر...' : 'Search for course...',
                           hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 13),
-                          prefixIcon: const Icon(Icons.search, color: primaryGreen, size: 20), // 👈 أيقونة أصغر
+                          prefixIcon: const Icon(Icons.search, color: primaryGreen, size: 20),
                           border: InputBorder.none,
-                          isDense: true, // 👈 يجعل الحقل مدمجاً أكثر
+                          isDense: true,
                           contentPadding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                       ),
@@ -116,11 +103,10 @@ class GeneralLibraryScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // 👇 3. شريط التبويبات المدمج (مكتبة الكلية / المكتبة العامة) 👇
             Container(
               color: Colors.transparent,
               child: TabBar(
-                dividerColor: Colors.transparent, // 👈 إزالة الخط الرمادي من هنا
+                dividerColor: Colors.transparent,
                 labelColor: primaryGreen,
                 unselectedLabelColor: Colors.grey,
                 indicatorColor: primaryGreen,
@@ -131,12 +117,12 @@ class GeneralLibraryScreen extends StatelessWidget {
               ),
             ),
 
-            // 👇 4. عرض محتوى التبويبات (شكل شبكي - Grid) 👇
             Expanded(
               child: TabBarView(
                 children: [
-                  _buildLibraryGrid(context, collegeLibraryCategories),
-                  _buildLibraryGrid(context, publicLibraryCategories),
+                  // 👇 هنا السر: نرسل false لمكتبة الكلية، و true للمكتبة العامة
+                  _buildLibraryGrid(context, collegeLibraryCategories, false),
+                  _buildLibraryGrid(context, publicLibraryCategories, true),
                 ],
               ),
             ),
@@ -146,8 +132,8 @@ class GeneralLibraryScreen extends StatelessWidget {
     );
   }
 
-  // بناء شبكة الأقسام باستخدام UnifiedItemCard الموحدة
-  Widget _buildLibraryGrid(BuildContext context, List<Map<String, dynamic>> categories) {
+  // 👇 تمت إضافة المتغير isPublic هنا ليمرر الحالة بدقة
+  Widget _buildLibraryGrid(BuildContext context, List<Map<String, dynamic>> categories, bool isPublic) {
     return GridView.builder(
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -161,15 +147,15 @@ class GeneralLibraryScreen extends StatelessWidget {
           icon: categories[index]['icon'],
           isGridView: true,
           onTap: () {
-            // إعادة الاستخدام: التوجيه لشاشة BooksListScreen الموحدة
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => BooksListScreen(
                   categoryName: categories[index]['title'],
-                  categoryId: 5, // مررنا ID افتراضي للقسم
-                  subjectId: 0,  // 0 يعني أننا لا نبحث داخل مقرر دراسي
-                  role: role,    // تمرير الصلاحية
+                  categoryId: 5,
+                  subjectId: 0,
+                  role: role,
+                  isPublicLibrary: isPublic, // 👈 الآن سيتم تمرير الحالة الصحيحة لـ BooksListScreen وتختفي الثلاث نقاط!
                 ),
               ),
             );
