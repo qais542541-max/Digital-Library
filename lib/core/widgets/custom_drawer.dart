@@ -3,28 +3,34 @@ import '../../features/downloads/screens/downloads_screen.dart';
 import '../../features/favorites/screens/favorites_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/about_us/about_screen.dart';
-import '../../features/settings/screens/profile_screen.dart'; // تأكد من مطابقة المسار لهيكلة ملفاتك
-import '../../features/layout/screens/main_screen.dart'; // استدعاء ملف الـ enum لمعرفة الصلاحية
+import '../../features/settings/screens/profile_screen.dart';
+import '../../features/layout/screens/main_screen.dart';
+// في ملف main_screen.dart
+import 'package:provider/provider.dart';
+import '../../../core/providers/settings_provider.dart';
+
+// داخل دالة الـ build في MainScreen:
+
 
 const Color appPrimaryGreen = Color(0xFF2E7D32);
 
 class CustomDrawer extends StatelessWidget {
-  final UserRole role; // استقبال دور المستخدم
+  final UserRole role;
 
   const CustomDrawer({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
-    // 1. قراءة حالة الوضع المظلم
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final settings = Provider.of<SettingsProvider>(context);
+    final bool isArabic = settings.languageCode == 'ar';
 
-    // 2. تحديد بيانات رأس القائمة (Header) برمجياً حسب الدور
     String userName = 'زائر (ضيف)';
     String userDesc = 'تصفح المكتبة بدون حساب';
     IconData userIcon = Icons.person_outline;
 
     if (role == UserRole.student) {
-      userName = 'عمار العقبي'; // سيأتي من قاعدة البيانات لاحقاً
+      userName = 'عمار العقبي';
       userDesc = 'طالب - مستوى ثالث';
       userIcon = Icons.school;
     } else if (role == UserRole.teacher) {
@@ -42,15 +48,13 @@ class CustomDrawer extends StatelessWidget {
     }
 
     return Drawer(
-      // تكيف لون خلفية القائمة مع الوضع المظلم
       backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
       child: Column(
         children: [
-          // 3. رأس القائمة (Header) المدمج
           UserAccountsDrawerHeader(
             decoration: const BoxDecoration(color: appPrimaryGreen),
-            accountName: Text(userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-            accountEmail: Text(userDesc, style: const TextStyle(color: Colors.white70)),
+            accountName: Text(userName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white, fontFamily: 'Cairo')),
+            accountEmail: Text(userDesc, style: const TextStyle(color: Colors.white70, fontFamily: 'Cairo')),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
               child: Icon(userIcon, size: 40, color: appPrimaryGreen),
@@ -59,76 +63,58 @@ class CustomDrawer extends StatelessWidget {
 
           Expanded(
             child: ListView(
-              padding: EdgeInsets.zero,
+              padding: const EdgeInsets.symmetric(vertical: 8),
               children: [
-                // 4. الملف الشخصي (يُخفى عن الضيف فقط)
-                // 4. الملف الشخصي (يُخفى عن الضيف فقط)
-                // 4. الملف الشخصي (يُخفى عن الضيف فقط)
-                if (role != UserRole.guest)
-                // 8. الإعدادات (تظهر للجميع)
-                // 4. الملف الشخصي (يُخفى عن الضيف فقط)
-                  if (role != UserRole.guest)
-                    _buildDrawerItem(
-                      context: context,
-                      title: 'الملف الشخصي', // 👈 التأكد من أن العنوان هو الملف الشخصي
-                      icon: Icons.person_outline, // 👈 أيقونة الشخص
-                      isDarkMode: isDarkMode,
-                      onTap: () {
-                        Navigator.pop(context); // إغلاق القائمة الجانبية أولاً
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ProfileScreen(role: role)), // تمرير دور المستخدم الفعلي
-                        );
-                      },
-                    ),
-
-                if (role != UserRole.guest)
+                // 1. تجميع العناصر المخفية عن الضيف في كتلة واحدة نظيفة
+                if (role != UserRole.guest) ...[
+                  _buildDrawerItem(
+                    title: isArabic ? 'الملف الشخصي' : 'Profile',
+                    icon: Icons.person_outline,
+                    isDarkMode: isDarkMode,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(role: role)));
+                    },
+                  ),
                   const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
 
-                // 5. التنزيلات (تُخفى عن الضيف وعن الموظف)
-                if (role != UserRole.guest && role != UserRole.employee)
                   _buildDrawerItem(
-                    context: context,
-                    title: 'ملفاتي وتنزيلاتي',
+                    title: isArabic ? 'تحميلاتي' : 'My Downloads',
                     icon: Icons.file_download_outlined,
                     isDarkMode: isDarkMode,
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const DownloadsScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => DownloadsScreen(role: role)));
                     },
                   ),
-
-                if (role != UserRole.guest && role != UserRole.employee)
                   const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
+                ],
 
-                // 6. المفضلة (تظهر للجميع مع حماية مخصصة للضيف)
+                // 2. العناصر التي تظهر للجميع
                 _buildDrawerItem(
-                  context: context,
-                  title: 'مفضلاتي',
+                  title: isArabic ? 'مفضلاتي' : 'Favorites',
                   icon: Icons.favorite_border,
                   isDarkMode: isDarkMode,
                   onTap: () {
+                    Navigator.pop(context);
                     if (role == UserRole.guest) {
-                      Navigator.pop(context); // إغلاق القائمة
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('يرجى تسجيل الدخول أو إنشاء حساب لحفظ مفضلاتك!'),
+                          content: Text('يرجى تسجيل الدخول أو إنشاء حساب لحفظ مفضلاتك!', style: TextStyle(fontFamily: 'Cairo')),
                           backgroundColor: Colors.orange,
+                          behavior: SnackBarBehavior.floating,
                         ),
                       );
                     } else {
-                      Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const FavoritesScreen()));
+                      // تم إصلاح النقص هنا بتمرير role
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => FavoritesScreen(role: role)));
                     }
                   },
                 ),
-
                 const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
 
-                // 7. من نحن (تظهر للجميع)
                 _buildDrawerItem(
-                  context: context,
-                  title: 'من نحن',
+                  title: isArabic ? 'من نحن' : 'About Us',
                   icon: Icons.info_outline,
                   isDarkMode: isDarkMode,
                   onTap: () {
@@ -136,40 +122,35 @@ class CustomDrawer extends StatelessWidget {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutScreen()));
                   },
                 ),
-
                 const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
 
-                // 8. الإعدادات (تظهر للجميع)
                 _buildDrawerItem(
-                  context: context,
-                  title: 'الإعدادات',
+                  title: isArabic ? 'الإعدادات' : 'Settings',
                   icon: Icons.settings_outlined,
                   isDarkMode: isDarkMode,
                   onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => SettingsScreen(role: role)),
-                    );
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SettingsScreen(role: role)));
                   },
                 ),
               ],
             ),
           ),
 
-          // 9. زر تسجيل الدخول / الخروج الذكي
           const Divider(height: 1),
           ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             leading: Icon(
               role == UserRole.guest ? Icons.login : Icons.logout,
               color: role == UserRole.guest ? appPrimaryGreen : Colors.red,
-              size: 28,
+              size: 26,
             ),
             title: Text(
               role == UserRole.guest ? 'تسجيل الدخول / إنشاء حساب' : 'تسجيل الخروج',
               style: TextStyle(
                 color: role == UserRole.guest ? appPrimaryGreen : Colors.red,
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 15,
+                fontFamily: 'Cairo',
               ),
             ),
             onTap: () {
@@ -183,25 +164,31 @@ class CustomDrawer extends StatelessWidget {
     );
   }
 
-  // دالة بناء الأزرار الموحدة والذكية
+  // دالة بناء الأزرار بتصميم عصري (تم تحسين الهوامش وإضافة سهم)
   Widget _buildDrawerItem({
-    required BuildContext context,
     required String title,
     required IconData icon,
     required bool isDarkMode,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      leading: Icon(icon, color: isDarkMode ? Colors.white70 : Colors.black87, size: 28),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: isDarkMode ? Colors.white : Colors.black87,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        leading: Icon(icon, color: isDarkMode ? Colors.white70 : Colors.black87, size: 24),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: isDarkMode ? Colors.white : Colors.black87,
+            fontFamily: 'Cairo',
+          ),
         ),
+        trailing: Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey.shade400),
+        onTap: onTap,
       ),
-      onTap: onTap,
     );
   }
 }
