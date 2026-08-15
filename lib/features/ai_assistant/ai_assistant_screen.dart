@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/widgets/notifications_screen.dart';
 import '../../features/layout/screens/main_screen.dart';
+import 'package:provider/provider.dart';
+import '../../../core/providers/settings_provider.dart';
 
 class AiAssistantScreen extends StatelessWidget {
   final UserRole role;
@@ -10,6 +12,8 @@ class AiAssistantScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final settings = Provider.of<SettingsProvider>(context);
+    final bool isArabic = settings.languageCode == 'ar';
 
     // إزالة Scaffold واستبداله بـ SafeArea و Column
     return SafeArea(
@@ -29,7 +33,7 @@ class AiAssistantScreen extends StatelessWidget {
 
                 // العنوان في المنتصف
                 Text(
-                  'المساعد الذكي',
+                  isArabic ? 'المساعد الذكي' : 'Smart Assistant',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
