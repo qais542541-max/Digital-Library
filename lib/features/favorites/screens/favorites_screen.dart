@@ -1,33 +1,32 @@
 import 'package:flutter/material.dart';
-
-// استدعاء الكارد الموحد
-import '../../../core/widgets/unified_item_card.dart';
+import '../../layout/screens/main_screen.dart';
+import '../../../core/widgets/resource_item_card.dart';
 
 class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({super.key});
+  final UserRole role;
+
+  const FavoritesScreen({super.key, required this.role});
 
   @override
   State<FavoritesScreen> createState() => _FavoritesScreenState();
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  // بيانات مؤقتة لتشغيل الشاشة
   List<Map<String, dynamic>> favoriteItems = [
     {
-      'id': 1,
-      'title': 'كتاب البرمجة بلغة C++',
-      'subtitle': 'أساسيات البرمجة',
+      'id': '1',
+      'title': 'البرمجة بلغة جافا',
+      'subtitle': 'مادة: مقدمة في البرمجة',
       'icon': Icons.picture_as_pdf,
     },
     {
-      'id': 2,
-      'title': 'مذكرة قواعد البيانات',
-      'subtitle': 'مستوى متقدم',
-      'icon': Icons.book,
+      'id': '2',
+      'title': 'محاضرة الخوارزميات',
+      'subtitle': 'مادة: هياكل البيانات',
+      'icon': Icons.ondemand_video,
     },
   ];
 
-  // دالة الحذف وتحديث الواجهة
   void _removeItem(int index, String actionType) {
     final removedItem = favoriteItems[index];
 
@@ -36,8 +35,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     });
 
     ScaffoldMessenger.of(context).clearSnackBars();
-
-    // إظهار رسالة حسب نوع الحذف
     String message = actionType == 'favorite_only'
         ? 'تمت الإزالة من التفضيلات: ${removedItem['title']}'
         : 'تمت الإزالة والحذف من الجهاز: ${removedItem['title']}';
@@ -53,88 +50,91 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    const Color primaryGreen = Color(0xFF2E7D32);
+    final Color scaffoldBackgroundColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
+
     return Scaffold(
+      backgroundColor: scaffoldBackgroundColor, // 👈 توحيد الخلفية
       appBar: AppBar(
-        title: const Text('مفضلاتي'),
+        elevation: 0,
+        backgroundColor: scaffoldBackgroundColor,
+        leading: const SizedBox(),
+        title: Text(
+          'مفضلاتي',
+          style: TextStyle(color: isDarkMode ? Colors.white : primaryGreen, fontWeight: FontWeight.bold, fontFamily: 'Cairo'),
+        ),
         centerTitle: true,
+        actions: [
+          // 👈 زر الرجوع في اليسار
+          IconButton(
+            icon: Icon(Icons.arrow_forward_ios, color: isDarkMode ? Colors.white : primaryGreen, size: 20),
+            onPressed: () => Navigator.pop(context),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: favoriteItems.isEmpty
           ? const Center(
         child: Text(
           'لا توجد عناصر في المفضلة حالياً',
-          style: TextStyle(fontSize: 18, color: Colors.grey),
+          style: TextStyle(fontSize: 16, color: Colors.grey, fontFamily: 'Cairo'),
         ),
       )
           : ListView.builder(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         itemCount: favoriteItems.length,
         itemBuilder: (context, index) {
           final item = favoriteItems[index];
 
           return Dismissible(
-            // تم إضافة toString() لأن الـ Key يقبل نصوص فقط
             key: Key(item['id'].toString()),
             direction: DismissDirection.endToStart,
-
-            // تصميم الخلفية عند السحب (اللون الأحمر مع أيقونة سلة المهملات)
             background: Container(
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.only(right: 20.0),
               color: Colors.red,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6), // 👈 مطابقة هوامش البطاقة
               child: const Icon(Icons.delete, color: Colors.white),
             ),
-
-            // نافذة التأكيد المنبثقة بثلاثة خيارات
             confirmDismiss: (direction) async {
+              // 👈 نافذة الحذف الموحدة بتصميم يتطابق مع البقية
               return await showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text("إزالة من التفضيلات"),
+                    title: const Text("إزالة من التفضيلات", style: TextStyle(fontFamily: 'Cairo')),
                     content: const Text("ما الإجراء الذي تريد اتخاذه تجاه هذا المورد؟"),
-                    actions: <Widget>[
+                    actions: [
                       TextButton(
-                        onPressed: () => Navigator.of(context).pop(null), // إلغاء السحب
-                        child: const Text("إلغاء"),
+                        onPressed: () => Navigator.of(context).pop(null),
+                        child: const Text("إلغاء", style: TextStyle(color: Colors.grey)),
                       ),
                       TextButton(
-                        onPressed: () {
-                          // إرجاع قيمة تدل على نوع الحذف
-                          Navigator.of(context).pop('favorite_only');
-                        },
-                        child: const Text("إزالة من التفضيلات فقط"),
+                        onPressed: () => Navigator.of(context).pop('favorite_only'),
+                        child: const Text("إزالة من التفضيلات", style: TextStyle(color: primaryGreen)),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          // إرجاع قيمة تدل على الحذف الكلي
-                          Navigator.of(context).pop('delete_both');
-                        },
-                        child: const Text(
-                          "إزالة وحذف من الهاتف",
-                          style: TextStyle(color: Colors.red),
-                        ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                        onPressed: () => Navigator.of(context).pop('delete_both'),
+                        child: const Text("إزالة وحذف", style: TextStyle(color: Colors.white)),
                       ),
                     ],
                   );
                 },
               );
             },
-
-            // تنفيذ الحذف بناءً على الخيار الذي تم اختياره في النافذة المنبثقة
             onDismissed: (direction) {
-              // ملاحظة: الـ direction هنا يعطينا اتجاه السحب، لكننا نعتمد على ما أرجعناه من confirmDismiss
-              // بما أن onDismissed لا تستقبل النتيجة المرجعة من confirmDismiss مباشرة،
-              // سنقوم بتمرير نوع افتراضي مؤقتاً، وسنحتاج مستقبلاً لمعالجة الحذف الفعلي (Delete from device)
-              // إما داخل confirmDismiss نفسها قبل الـ pop، أو عبر متغيرات مساعدة.
-
-              // للتطبيق الحالي (تحديث الواجهة):
+              // الاعتماد مؤقتاً على الإزالة من التفضيلات، ويمكنك برمجتها لاحقاً لتمرير الخيار الفعلي
               _removeItem(index, 'favorite_only');
             },
-            child: UnifiedItemCard(
+            child: ResourceItemCard( // 👈 استخدام البطاقة الجديدة
               title: item['title'],
               subtitle: item['subtitle'],
-              isGridView: false,
               icon: item['icon'],
+              role: widget.role,
+              onTap: () => print('فتح ${item['title']}'),
+              onDownload: () => print('بدء تحميل ${item['title']}'),
             ),
           );
         },
