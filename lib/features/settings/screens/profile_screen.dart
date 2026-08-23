@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/providers/settings_provider.dart';
@@ -16,7 +17,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   // متحكمات النصوص (سيتم تعبئتها لاحقاً من قاعدة البيانات حسب المستخدم)
-  final TextEditingController _nameController = TextEditingController(text: 'عمار العقبي');
+  final TextEditingController _nameController = TextEditingController(text: 'profile_screen.mock_name'.tr());
   final TextEditingController _emailController = TextEditingController(text: 'ammar@scc.edu.ye');
   final TextEditingController _phoneController = TextEditingController(text: '+967 77X XXX XXX');
 
@@ -49,19 +50,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     const Color primaryGreen = Color(0xFF2E7D32);
     final settings = Provider.of<SettingsProvider>(context);
     final isDarkMode = settings.isDarkMode;
-    final isArabic = settings.languageCode == 'ar';
 
     // 👇 تحديد مسمى الرقم الثابت حسب الصلاحية
     final String idLabel = widget.role == UserRole.student
-        ? (isArabic ? 'الرقم الجامعي' : 'Student ID')
-        : (isArabic ? 'الرقم الوظيفي' : 'Employee ID');
+        ? 'profile_screen.student_id'.tr()
+        : 'profile_screen.employee_id'.tr();
 
     final String idValue = widget.role == UserRole.student ? '20241050' : '900125';
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.grey.shade50,
       appBar: AppBar(
-        title: Text(isArabic ? 'الملف الشخصي' : 'Profile'),
+        title: Text('profile_screen.title'.tr()),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -131,24 +131,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // 👇 هذه الحقول تظهر للطالب فــــــــــقــــــــــط 👇
                   if (widget.role == UserRole.student) ...[
                     const Divider(height: 20),
-                    _buildReadOnlyInfo(Icons.computer, isArabic ? 'التخصص' : 'Major', isArabic ? 'برمجة حاسوب' : 'Computer Programming', isDarkMode),
+                    _buildReadOnlyInfo(Icons.computer, 'profile_screen.major'.tr(), 'profile_screen.computer_programming'.tr(), isDarkMode),
                     const Divider(height: 20),
                     _buildDropdownRow(
                       icon: Icons.school,
-                      title: isArabic ? 'المستوى الدراسي' : 'Academic Year',
+                      title: 'profile_screen.academic_year'.tr(),
                       currentValue: settings.academicYear,
-                      items: ['السنة الأولى', 'السنة الثانية', 'السنة الثالثة', 'السنة الرابعة'],
-                      onChanged: (val) => settings.changeAcademicYear(val!),
+                      items: [
+                        'profile_screen.first_year'.tr(),
+                        'profile_screen.second_year'.tr(),
+                        'profile_screen.third_year'.tr(),
+                        'profile_screen.fourth_year'.tr()
+                      ],
+                      onChanged: (val) {
+                        if (val != null) settings.changeAcademicYear(val);
+                      },
                       isDarkMode: isDarkMode,
                     ),
                     const Divider(height: 20),
                     _buildDropdownRow(
                       icon: Icons.calendar_month,
-                      title: isArabic ? 'الترم الحالي' : 'Current Term',
-                      currentValue: settings.academicTermIndex == 0 ? 'الترم الأول' : 'الترم الثاني',
-                      items: ['الترم الأول', 'الترم الثاني'],
+                      title: 'profile_screen.current_term'.tr(),
+                      currentValue: settings.academicTermIndex == 0 ? 'profile_screen.first_term'.tr() : 'profile_screen.second_term'.tr(),
+                      items: ['profile_screen.first_term'.tr(), 'profile_screen.second_term'.tr()],
                       onChanged: (val) {
-                        int index = val == 'الترم الأول' ? 0 : 1;
+                        int index = val == 'profile_screen.first_term'.tr() ? 0 : 1;
                         settings.changeAcademicTerm(index);
                       },
                       isDarkMode: isDarkMode,
@@ -160,11 +167,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 25),
 
             // 3. البيانات الشخصية المتاحة للجميع للتعديل
-            _buildEditableField(isArabic ? 'الاسم الكامل' : 'Full Name', Icons.person_outline, _nameController, isDarkMode),
+            _buildEditableField('profile_screen.full_name'.tr(), Icons.person_outline, _nameController, isDarkMode),
             const SizedBox(height: 16),
-            _buildEditableField(isArabic ? 'البريد الإلكتروني' : 'Email', Icons.email_outlined, _emailController, isDarkMode, isEmail: true),
+            _buildEditableField('profile_screen.email'.tr(), Icons.email_outlined, _emailController, isDarkMode, isEmail: true),
             const SizedBox(height: 16),
-            _buildEditableField(isArabic ? 'رقم الهاتف' : 'Phone Number', Icons.phone_outlined, _phoneController, isDarkMode, isPhone: true),
+            _buildEditableField('profile_screen.phone_number'.tr(), Icons.phone_outlined, _phoneController, isDarkMode, isPhone: true),
             const SizedBox(height: 40),
 
             // 4. زر الحفظ
@@ -174,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(isArabic ? 'تم تحديث بياناتك بنجاح' : 'Profile updated successfully'),
+                      content: Text('profile_screen.success_msg'.tr()),
                       backgroundColor: primaryGreen,
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -189,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 child: Text(
-                  isArabic ? 'حفظ التغييرات' : 'Save Changes',
+                  'profile_screen.save_changes'.tr(),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
@@ -234,7 +241,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: DropdownButton<String>(
                   isDense: true,
                   isExpanded: true,
-                  value: currentValue,
+                  value: items.contains(currentValue) ? currentValue : items.first,
                   dropdownColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
                   style: TextStyle(
                     fontSize: 15,

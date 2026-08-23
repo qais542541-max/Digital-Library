@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../features/downloads/screens/downloads_screen.dart';
 import '../../features/favorites/screens/favorites_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
@@ -23,27 +24,27 @@ class CustomDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final settings = Provider.of<SettingsProvider>(context);
-    final bool isArabic = settings.languageCode == 'ar';
+    final isArabic = context.locale.languageCode == 'ar';
 
-    String userName = 'زائر (ضيف)';
-    String userDesc = 'تصفح المكتبة بدون حساب';
+    String userName = 'custom_drawer.guest_user'.tr();
+    String userDesc = 'custom_drawer.browse_without_account'.tr();
     IconData userIcon = Icons.person_outline;
 
     if (role == UserRole.student) {
-      userName = 'عمار العقبي';
-      userDesc = 'طالب - مستوى ثالث';
+      userName = 'custom_drawer.student_name'.tr();
+      userDesc = 'custom_drawer.student_level'.tr();
       userIcon = Icons.school;
     } else if (role == UserRole.teacher) {
-      userName = 'د. أحمد الشيباني';
-      userDesc = 'عضو هيئة تدريس';
+      userName = 'custom_drawer.teacher_name'.tr();
+      userDesc = 'custom_drawer.faculty_member'.tr();
       userIcon = Icons.workspace_premium;
     } else if (role == UserRole.employee) {
-      userName = 'يوسف شمسان';
-      userDesc = 'إدارة المكتبة';
+      userName = 'custom_drawer.employee_name'.tr();
+      userDesc = 'custom_drawer.library_management'.tr();
       userIcon = Icons.admin_panel_settings;
     } else if (role == UserRole.external) {
-      userName = 'محمد أحمد';
-      userDesc = 'باحث خارجي';
+      userName = 'custom_drawer.external_researcher_name'.tr();
+      userDesc = 'custom_drawer.external_researcher'.tr();
       userIcon = Icons.person;
     }
 
@@ -68,7 +69,7 @@ class CustomDrawer extends StatelessWidget {
                 // 1. تجميع العناصر المخفية عن الضيف في كتلة واحدة نظيفة
                 if (role != UserRole.guest) ...[
                   _buildDrawerItem(
-                    title: isArabic ? 'الملف الشخصي' : 'Profile',
+                    title: 'custom_drawer.profile'.tr(),
                     icon: Icons.person_outline,
                     isDarkMode: isDarkMode,
                     onTap: () {
@@ -79,7 +80,7 @@ class CustomDrawer extends StatelessWidget {
                   const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
 
                   _buildDrawerItem(
-                    title: isArabic ? 'تحميلاتي' : 'My Downloads',
+                    title: 'custom_drawer.my_downloads'.tr(),
                     icon: Icons.file_download_outlined,
                     isDarkMode: isDarkMode,
                     onTap: () {
@@ -92,15 +93,15 @@ class CustomDrawer extends StatelessWidget {
 
                 // 2. العناصر التي تظهر للجميع
                 _buildDrawerItem(
-                  title: isArabic ? 'مفضلاتي' : 'Favorites',
+                  title: 'custom_drawer.favorites'.tr(),
                   icon: Icons.favorite_border,
                   isDarkMode: isDarkMode,
                   onTap: () {
                     Navigator.pop(context);
                     if (role == UserRole.guest) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('يرجى تسجيل الدخول أو إنشاء حساب لحفظ مفضلاتك!', style: TextStyle(fontFamily: 'Cairo')),
+                         SnackBar(
+                          content: Text('custom_drawer.login_required_favorites'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
                           backgroundColor: Colors.orange,
                           behavior: SnackBarBehavior.floating,
                         ),
@@ -114,7 +115,7 @@ class CustomDrawer extends StatelessWidget {
                 const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
 
                 _buildDrawerItem(
-                  title: isArabic ? 'من نحن' : 'About Us',
+                  title: 'custom_drawer.about_us'.tr(),
                   icon: Icons.info_outline,
                   isDarkMode: isDarkMode,
                   onTap: () {
@@ -125,7 +126,7 @@ class CustomDrawer extends StatelessWidget {
                 const Divider(height: 15, thickness: 1, indent: 20, endIndent: 20),
 
                 _buildDrawerItem(
-                  title: isArabic ? 'الإعدادات' : 'Settings',
+                  title: 'custom_drawer.settings'.tr(),
                   icon: Icons.settings_outlined,
                   isDarkMode: isDarkMode,
                   onTap: () {
@@ -145,7 +146,7 @@ class CustomDrawer extends StatelessWidget {
               size: 26,
             ),
             title: Text(
-              role == UserRole.guest ? 'تسجيل الدخول / إنشاء حساب' : 'تسجيل الخروج',
+              role == UserRole.guest ? 'custom_drawer.login_signup'.tr() : 'custom_drawer.logout'.tr(),
               style: TextStyle(
                 color: role == UserRole.guest ? appPrimaryGreen : Colors.red,
                 fontWeight: FontWeight.bold,

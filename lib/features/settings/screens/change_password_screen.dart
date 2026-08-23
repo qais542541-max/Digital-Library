@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 // دالة خارجية مستقلة لاستدعاء النافذة بسهولة
 void showChangePasswordDialog(BuildContext context, bool isDarkMode) {
@@ -29,8 +30,8 @@ void showChangePasswordDialog(BuildContext context, bool isDarkMode) {
                 const SizedBox(width: 8),
                 Text(
                   step == 1
-                      ? 'تغيير كلمة المرور'
-                      : (step == 2 ? 'إدخال رمز التحقق' : 'كلمة المرور الجديدة'),
+                      ? 'change_password_screen.title_step_1'.tr()
+                      : (step == 2 ? 'change_password_screen.title_step_2'.tr() : 'change_password_screen.title_step_3'.tr()),
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black87,
                     fontSize: 18,
@@ -50,7 +51,7 @@ void showChangePasswordDialog(BuildContext context, bool isDarkMode) {
                       obscureText: obscureCurrent,
                       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
                       decoration: InputDecoration(
-                        labelText: 'كلمة المرور الحالية',
+                        labelText: 'change_password_screen.current_password'.tr(),
                         labelStyle: const TextStyle(color: Colors.grey),
                         filled: true,
                         fillColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade50,
@@ -67,7 +68,7 @@ void showChangePasswordDialog(BuildContext context, bool isDarkMode) {
                       obscureText: obscureNew,
                       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
                       decoration: InputDecoration(
-                        labelText: 'كلمة المرور الجديدة',
+                        labelText: 'change_password_screen.new_password'.tr(),
                         labelStyle: const TextStyle(color: Colors.grey),
                         filled: true,
                         fillColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade50,
@@ -83,13 +84,13 @@ void showChangePasswordDialog(BuildContext context, bool isDarkMode) {
                       alignment: Alignment.centerLeft,
                       child: TextButton(
                         onPressed: () => setStateDialog(() => step = 2),
-                        child: const Text('نسيت كلمة المرور؟', style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold)),
+                        child: Text('change_password_screen.forgot_password'.tr(), style: const TextStyle(color: primaryGreen, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
                   if (step == 2) ...[
                     Text(
-                      'تم إرسال رمز تحقق مكون من 4 أرقام إلى بريدك الإلكتروني.',
+                      'change_password_screen.verification_code_sent'.tr(),
                       style: TextStyle(color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600, fontSize: 13),
                     ),
                     const SizedBox(height: 16),
@@ -108,14 +109,14 @@ void showChangePasswordDialog(BuildContext context, bool isDarkMode) {
                     ),
                   ],
                   if (step == 3) ...[
-                    const Text('الرجاء إدخال كلمة المرور الجديدة وتأكيدها.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                    Text('change_password_screen.enter_and_confirm_new_password'.tr(), style: const TextStyle(color: Colors.grey, fontSize: 13)),
                     const SizedBox(height: 16),
                     TextField(
                       controller: newPassController,
                       obscureText: obscureNew,
                       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
                       decoration: InputDecoration(
-                        labelText: 'كلمة المرور الجديدة',
+                        labelText: 'change_password_screen.new_password'.tr(),
                         labelStyle: const TextStyle(color: Colors.grey),
                         filled: true,
                         fillColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade50,
@@ -128,7 +129,7 @@ void showChangePasswordDialog(BuildContext context, bool isDarkMode) {
                       obscureText: obscureConfirm,
                       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
                       decoration: InputDecoration(
-                        labelText: 'تأكيد كلمة المرور',
+                        labelText: 'change_password_screen.confirm_password'.tr(),
                         labelStyle: const TextStyle(color: Colors.grey),
                         filled: true,
                         fillColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade50,
@@ -142,14 +143,14 @@ void showChangePasswordDialog(BuildContext context, bool isDarkMode) {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('إلغاء', style: TextStyle(color: Colors.grey)),
+                child: Text('change_password_screen.cancel'.tr(), style: const TextStyle(color: Colors.grey)),
               ),
               ElevatedButton(
                 onPressed: () {
                   if (step == 1 || step == 3) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('تم تحديث كلمة المرور بنجاح'), backgroundColor: primaryGreen),
+                      SnackBar(content: Text('change_password_screen.password_updated_successfully'.tr()), backgroundColor: primaryGreen),
                     );
                   } else if (step == 2) {
                     if (codeController.text.isNotEmpty) {
@@ -158,7 +159,7 @@ void showChangePasswordDialog(BuildContext context, bool isDarkMode) {
                   }
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: primaryGreen),
-                child: Text(step == 2 ? 'تحقق' : 'حفظ', style: const TextStyle(color: Colors.white)),
+                child: Text(step == 2 ? 'change_password_screen.verify'.tr() : 'change_password_screen.save'.tr(), style: const TextStyle(color: Colors.white)),
               ),
             ],
           );

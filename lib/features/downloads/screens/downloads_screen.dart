@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../layout/screens/main_screen.dart'; // لاستدعاء UserRole
 import '../../../core/widgets/resource_item_card.dart'; // 👈 استدعاء الكارد الجديد
 
@@ -15,14 +16,14 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   List<Map<String, dynamic>> downloadedItems = [
     {
       'id': '1',
-      'title': 'كتاب البرمجة بلغة C++',
-      'subtitle': 'ملف PDF - 2.5 MB',
+      'title': 'downloads_screen.cpp_book_title'.tr(),
+      'subtitle': 'downloads_screen.pdf_file_size'.tr(),
       'icon': Icons.picture_as_pdf,
     },
     {
       'id': '2',
-      'title': 'مذكرة قواعد البيانات',
-      'subtitle': 'مستند - 1.2 MB',
+      'title': 'downloads_screen.db_notes_title'.tr(),
+      'subtitle': 'downloads_screen.doc_file_size'.tr(),
       'icon': Icons.book,
     },
   ];
@@ -37,10 +38,10 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('تم حذف: ${removedItem['title']}'),
+        content: Text('downloads_screen.item_deleted_msg'.tr(args: [removedItem['title']])),
         behavior: SnackBarBehavior.floating,
         action: SnackBarAction(
-          label: 'تراجع',
+          label: 'downloads_screen.undo'.tr(),
           textColor: Colors.blueAccent,
           onPressed: () {
             setState(() {
@@ -66,7 +67,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         backgroundColor: scaffoldBackgroundColor,
         leading: const SizedBox(), // تفريغ اليمين
         title: Text(
-          'تحميلاتي',
+          'downloads_screen.title'.tr(),
           style: TextStyle(color: isDarkMode ? Colors.white : primaryGreen, fontWeight: FontWeight.bold, fontFamily: 'Cairo'),
         ),
         centerTitle: true,
@@ -80,10 +81,10 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         ],
       ),
       body: downloadedItems.isEmpty
-          ? const Center(
+          ? Center(
         child: Text(
-          'لا توجد ملفات محملة حالياً',
-          style: TextStyle(fontSize: 16, color: Colors.grey, fontFamily: 'Cairo'),
+          'downloads_screen.no_files'.tr(),
+          style: const TextStyle(fontSize: 16, color: Colors.grey, fontFamily: 'Cairo'),
         ),
       )
           : ListView.builder(
@@ -108,17 +109,17 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text("تأكيد الحذف", style: TextStyle(fontFamily: 'Cairo')),
-                    content: const Text("هل أنت متأكد من حذف هذا الملف نهائياً من جهازك؟"),
+                    title: Text("downloads_screen.delete_confirm_title".tr(), style: const TextStyle(fontFamily: 'Cairo')),
+                    content: Text("downloads_screen.delete_confirm_msg".tr()),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text("إلغاء", style: TextStyle(color: Colors.grey)),
+                        child: Text("downloads_screen.cancel".tr(), style: const TextStyle(color: Colors.grey)),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                         onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text("حذف", style: TextStyle(color: Colors.white)),
+                        child: Text("downloads_screen.delete".tr(), style: const TextStyle(color: Colors.white)),
                       ),
                     ],
                   );
@@ -134,7 +135,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               icon: item['icon'],
               role: widget.role,
               onTap: () => print('فتح ${item['title']}'),
-              onDownload: () => print('الملف محمل مسبقاً'),
+              onDownload: () => print('downloads_screen.already_downloaded'.tr()),
             ),
           );
         },

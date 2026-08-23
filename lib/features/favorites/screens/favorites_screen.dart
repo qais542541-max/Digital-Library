@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../layout/screens/main_screen.dart';
 import '../../../core/widgets/resource_item_card.dart';
 
@@ -15,14 +16,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   List<Map<String, dynamic>> favoriteItems = [
     {
       'id': '1',
-      'title': 'البرمجة بلغة جافا',
-      'subtitle': 'مادة: مقدمة في البرمجة',
+      'title': 'favorites_screen.java_book_title'.tr(),
+      'subtitle': 'favorites_screen.java_book_subtitle'.tr(),
       'icon': Icons.picture_as_pdf,
     },
     {
       'id': '2',
-      'title': 'محاضرة الخوارزميات',
-      'subtitle': 'مادة: هياكل البيانات',
+      'title': 'favorites_screen.algorithms_lecture_title'.tr(),
+      'subtitle': 'favorites_screen.algorithms_lecture_subtitle'.tr(),
       'icon': Icons.ondemand_video,
     },
   ];
@@ -36,8 +37,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     String message = actionType == 'favorite_only'
-        ? 'تمت الإزالة من التفضيلات: ${removedItem['title']}'
-        : 'تمت الإزالة والحذف من الجهاز: ${removedItem['title']}';
+        ? 'favorites_screen.removed_from_favorites'.tr(args: [removedItem['title']])
+        : 'favorites_screen.removed_and_deleted'.tr(args: [removedItem['title']]);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -61,7 +62,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         backgroundColor: scaffoldBackgroundColor,
         leading: const SizedBox(),
         title: Text(
-          'مفضلاتي',
+          'favorites_screen.title'.tr(),
           style: TextStyle(color: isDarkMode ? Colors.white : primaryGreen, fontWeight: FontWeight.bold, fontFamily: 'Cairo'),
         ),
         centerTitle: true,
@@ -75,10 +76,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ],
       ),
       body: favoriteItems.isEmpty
-          ? const Center(
+          ? Center(
         child: Text(
-          'لا توجد عناصر في المفضلة حالياً',
-          style: TextStyle(fontSize: 16, color: Colors.grey, fontFamily: 'Cairo'),
+          'favorites_screen.no_items'.tr(),
+          style: const TextStyle(fontSize: 16, color: Colors.grey, fontFamily: 'Cairo'),
         ),
       )
           : ListView.builder(
@@ -103,21 +104,21 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text("إزالة من التفضيلات", style: TextStyle(fontFamily: 'Cairo')),
-                    content: const Text("ما الإجراء الذي تريد اتخاذه تجاه هذا المورد؟"),
+                    title: Text("favorites_screen.remove_dialog_title".tr(), style: const TextStyle(fontFamily: 'Cairo')),
+                    content: Text("favorites_screen.remove_dialog_content".tr()),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(null),
-                        child: const Text("إلغاء", style: TextStyle(color: Colors.grey)),
+                        child: Text("favorites_screen.cancel".tr(), style: const TextStyle(color: Colors.grey)),
                       ),
                       TextButton(
                         onPressed: () => Navigator.of(context).pop('favorite_only'),
-                        child: const Text("إزالة من التفضيلات", style: TextStyle(color: primaryGreen)),
+                        child: Text("favorites_screen.remove_only".tr(), style: const TextStyle(color: primaryGreen)),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                         onPressed: () => Navigator.of(context).pop('delete_both'),
-                        child: const Text("إزالة وحذف", style: TextStyle(color: Colors.white)),
+                        child: Text("favorites_screen.remove_and_delete".tr(), style: const TextStyle(color: Colors.white)),
                       ),
                     ],
                   );

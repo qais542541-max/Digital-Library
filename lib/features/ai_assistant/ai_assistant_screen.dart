@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/widgets/notifications_screen.dart';
 import '../../features/layout/screens/main_screen.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +14,6 @@ class AiAssistantScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final settings = Provider.of<SettingsProvider>(context);
-    final bool isArabic = settings.languageCode == 'ar';
 
     // إزالة Scaffold واستبداله بـ SafeArea و Column
     return SafeArea(
@@ -33,7 +33,7 @@ class AiAssistantScreen extends StatelessWidget {
 
                 // العنوان في المنتصف
                 Text(
-                  isArabic ? 'المساعد الذكي' : 'Smart Assistant',
+                  'ai_assistant_screen.title'.tr(),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -73,17 +73,17 @@ class AiAssistantScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               children: [
                 _buildChatBubble(
-                  text: 'أهلاً بك! كيف يمكنني مساعدتك في دراستك اليوم؟',
+                  text: 'ai_assistant_screen.welcome_msg'.tr(),
                   isAi: true,
                   isDarkMode: isDarkMode,
                 ),
                 _buildChatBubble(
-                  text: 'أين أجد ملزمة جودة البرمجيات؟',
+                  text: 'ai_assistant_screen.user_query_example'.tr(),
                   isAi: false,
                   isDarkMode: isDarkMode,
                 ),
                 _buildChatBubble(
-                  text: 'ملزمة جودة البرمجيات موجودة في قسم: السنة الثالثة ⬅️ الترم الأول. هل تريدني أن أنقلك إليها مباشرة؟',
+                  text: 'ai_assistant_screen.ai_response_example'.tr(),
                   isAi: true,
                   isDarkMode: isDarkMode,
                 ),
@@ -147,7 +147,7 @@ class AiAssistantScreen extends StatelessWidget {
             child: TextField(
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
               decoration: InputDecoration(
-                hintText: 'اسأل عن أي مادة أو ملزمة...',
+                hintText: 'ai_assistant_screen.input_hint'.tr(),
                 hintStyle: TextStyle(color: isDarkMode ? Colors.grey.shade400 : Colors.grey),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25),
@@ -165,7 +165,7 @@ class AiAssistantScreen extends StatelessWidget {
             child: IconButton(
               icon: const Icon(Icons.send, color: Colors.white, size: 20),
               onPressed: () {
-                print('تم الضغط على زر الإرسال');
+                print('ai_assistant_screen.send_button_pressed'.tr());
               },
             ),
           ),

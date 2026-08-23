@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:digital_library/core/providers/settings_provider.dart';
 import 'package:digital_library/core/widgets/unified_item_card.dart';
@@ -19,7 +20,6 @@ class GeneralMainScreen extends StatelessWidget {
     const Color primaryGreen = Color(0xFF2E7D32);
     final settings = Provider.of<SettingsProvider>(context);
     final isDarkMode = settings.isDarkMode;
-    final isArabic = settings.languageCode == 'ar';
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.grey.shade50,
@@ -27,12 +27,14 @@ class GeneralMainScreen extends StatelessWidget {
       // الترويسة المسطحة (نمط المكتبة الشاملة)
       appBar: AppBar(
         elevation: 0,
+        scrolledUnderElevation: 0, // 👈 هذا السطر يمنع تغير لون الـ AppBar للرمادي عند النزول
         backgroundColor: Colors.transparent,
         title: Text(
-          isArabic ? 'الرئيسية' : 'Home',
+          'general_main_screen.title'.tr(),
           style: TextStyle(
             color: isDarkMode ? Colors.white : Colors.black87,
             fontWeight: FontWeight.bold,
+            fontFamily: 'Cairo',
           ),
         ),
         centerTitle: true,
@@ -80,27 +82,30 @@ class GeneralMainScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isArabic ? 'مرحباً، $userName! 👋' : 'Welcome, $userName! 👋',
+                    'general_main_screen.welcome_msg'.tr(args: [userName]),
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: isDarkMode ? Colors.white : Colors.black87,
+                      fontFamily: 'Cairo',
                     ),
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    isArabic ? 'الصفة: $userRole' : 'Role: $userRole',
+                    'general_main_screen.role'.tr(args: [userRole]),
                     style: TextStyle(
                       fontSize: 14,
                       color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                      fontFamily: 'Cairo',
                     ),
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    isArabic ? 'ماذا تريد أن تتعلم اليوم؟' : 'What do you want to learn today?',
+                    'general_main_screen.learn_today'.tr(),
                     style: TextStyle(
                       fontSize: 14,
                       color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                      fontFamily: 'Cairo',
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -119,10 +124,10 @@ class GeneralMainScreen extends StatelessWidget {
                       ],
                     ),
                     child: TextField(
-                      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
+                      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87, fontFamily: 'Cairo'),
                       decoration: InputDecoration(
-                        hintText: isArabic ? 'ابحث عن ملازم، مشاريع، محاضرات...' : 'Search for books, projects...',
-                        hintStyle: TextStyle(color: Colors.grey.shade500),
+                        hintText: 'general_main_screen.search_hint'.tr(),
+                        hintStyle: TextStyle(color: Colors.grey.shade500, fontFamily: 'Cairo'),
                         prefixIcon: const Icon(Icons.search, color: primaryGreen),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(vertical: 15),
@@ -153,10 +158,10 @@ class GeneralMainScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildFlatQuickAction(Icons.video_library, isArabic ? 'المحاضرات' : 'Lectures', primaryGreen, isDarkMode),
-                    _buildFlatQuickAction(Icons.architecture, isArabic ? 'المشاريع' : 'Projects', primaryGreen, isDarkMode),
-                    _buildFlatQuickAction(Icons.menu_book, isArabic ? 'الكتب' : 'Books', primaryGreen, isDarkMode),
-                    _buildFlatQuickAction(Icons.article_outlined, isArabic ? 'الإعلانات' : 'News', primaryGreen, isDarkMode),
+                    _buildFlatQuickAction(Icons.video_library, 'general_main_screen.lectures'.tr(), primaryGreen, isDarkMode),
+                    _buildFlatQuickAction(Icons.architecture, 'general_main_screen.projects'.tr(), primaryGreen, isDarkMode),
+                    _buildFlatQuickAction(Icons.menu_book, 'general_main_screen.books'.tr(), primaryGreen, isDarkMode),
+                    _buildFlatQuickAction(Icons.article_outlined, 'general_main_screen.news'.tr(), primaryGreen, isDarkMode),
                   ],
                 ),
               ),
@@ -164,7 +169,7 @@ class GeneralMainScreen extends StatelessWidget {
             const SizedBox(height: 25),
 
             // 3. أحدث الإضافات (Horizontal Scroll)
-            _buildSectionTitle(isArabic ? 'أحدث الإضافات للمكتبة' : 'Recently Added', isDarkMode),
+            _buildSectionTitle('general_main_screen.recently_added'.tr(), isDarkMode),
             SizedBox(
               height: 180,
               child: ListView.builder(
@@ -176,8 +181,8 @@ class GeneralMainScreen extends StatelessWidget {
                     width: 140,
                     margin: const EdgeInsets.symmetric(horizontal: 5.0),
                     child: UnifiedItemCard(
-                      title: isArabic ? 'ملزمة برمجة متقدمة' : 'Advanced Programming',
-                      subtitle: 'د. أحمد محمد',
+                      title: 'general_main_screen.advanced_programming'.tr(),
+                      subtitle: 'general_main_screen.doctor_name'.tr(),
                       icon: Icons.picture_as_pdf,
                       isGridView: true,
                       onTap: () {},
@@ -190,7 +195,7 @@ class GeneralMainScreen extends StatelessWidget {
             const SizedBox(height: 25),
 
             // 4. إعلانات وأخبار الكلية (Vertical List)
-            _buildSectionTitle(isArabic ? 'أخبار وإعلانات الكلية' : 'College News', isDarkMode),
+            _buildSectionTitle('general_main_screen.college_news'.tr(), isDarkMode),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -222,18 +227,20 @@ class GeneralMainScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isArabic ? 'موعد مناقشة مشاريع التخرج' : 'Graduation Projects Defense',
+                                'general_main_screen.defense_title'.tr(),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: isDarkMode ? Colors.white : Colors.black87,
+                                  fontFamily: 'Cairo',
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                isArabic ? 'تم تحديد موعد مناقشة مشاريع التخرج...' : 'The date for the projects defense has been set...',
+                                'general_main_screen.defense_desc'.tr(),
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                                  fontFamily: 'Cairo',
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -248,6 +255,88 @@ class GeneralMainScreen extends StatelessWidget {
               },
             ),
             const SizedBox(height: 20),
+
+            // ==========================================
+            // 5. قسم التواصل السريع (تذييل التطبيق المدمج)
+            // ==========================================
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isDarkMode
+                        ? [const Color(0xFF1E1E1E), const Color(0xFF2C2C2C)]
+                        : [primaryGreen, const Color(0xFF1B5E20)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDarkMode ? Colors.black26 : primaryGreen.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'general_main_screen.need_help'.tr(),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontFamily: 'Cairo',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'general_main_screen.support_team'.tr(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white70,
+                        fontFamily: 'Cairo',
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // أزرار التواصل الأساسية
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildContactButton(Icons.phone, 'general_main_screen.call'.tr(), () {
+                          print('general_main_screen.calling'.tr());
+                        }),
+                        _buildContactButton(Icons.map_outlined, 'general_main_screen.location'.tr(), () {
+                          print('general_main_screen.opening_map'.tr());
+                        }),
+                        _buildContactButton(Icons.email_outlined, 'general_main_screen.email'.tr(), () {
+                          print('general_main_screen.opening_email'.tr());
+                        }),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+                    const Divider(color: Colors.white24),
+                    const SizedBox(height: 10),
+
+                    // حقوق النشر
+                    Text(
+                      'general_main_screen.copyright'.tr(),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.white54,
+                        fontFamily: 'Cairo',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 30), // مسافة سفلية قبل الـ BottomNavigationBar
           ],
         ),
       ),
@@ -264,19 +353,20 @@ class GeneralMainScreen extends StatelessWidget {
           fontSize: 18,
           fontWeight: FontWeight.bold,
           color: isDarkMode ? Colors.white : Colors.black87,
+          fontFamily: 'Cairo',
         ),
       ),
     );
   }
 
-  // الدالة المحدثة لبناء الأزرار المسطحة داخل الحاوية المجمعة
+  // الدالة لبناء الأزرار المسطحة داخل الحاوية المجمعة
   Widget _buildFlatQuickAction(IconData icon, String label, Color color, bool isDarkMode) {
     return Column(
       children: [
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1), // لون شفاف لتمييز الأيقونة
+            color: color.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: color, size: 28),
@@ -288,9 +378,36 @@ class GeneralMainScreen extends StatelessWidget {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: isDarkMode ? Colors.grey.shade300 : Colors.black87,
+            fontFamily: 'Cairo',
           ),
         ),
       ],
+    );
+  }
+
+  // 👇 تم نقل الدالة لتصبح تابعة للكلاس بشكل صحيح
+  Widget _buildContactButton(IconData icon, String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white24),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.white, size: 22),
+            const SizedBox(height: 5),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 12, fontFamily: 'Cairo'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

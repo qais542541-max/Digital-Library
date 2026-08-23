@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ProjectDetailsDialog extends StatelessWidget {
   final Map<String, dynamic> project;
@@ -77,7 +78,7 @@ class ProjectDetailsDialog extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          'دفعة ${project['year']}',
+                          'project_details_dialog.class_of'.tr(args: [project['year'].toString()]),
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -91,7 +92,7 @@ class ProjectDetailsDialog extends StatelessWidget {
 
                   // النبذة (الوصف)
                   Text(
-                    'نبذة عن المشروع:',
+                    'project_details_dialog.about_project'.tr(),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -100,7 +101,7 @@ class ProjectDetailsDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    project['description'] ?? 'لا توجد تفاصيل إضافية لهذا المشروع.',
+                    project['description'] ?? 'project_details_dialog.no_additional_details'.tr(),
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.6,
@@ -114,9 +115,9 @@ class ProjectDetailsDialog extends StatelessWidget {
                   ),
 
                   // تفاصيل الطلاب والمشرف
-                  _buildDetailRow(Icons.group, 'إعداد الطلاب:', project['students'], isDarkMode),
+                  _buildDetailRow(Icons.group, 'project_details_dialog.prepared_by'.tr(), project['students'], isDarkMode),
                   const SizedBox(height: 16),
-                  _buildDetailRow(Icons.person, 'إشراف أكاديمي:', project['supervisor'], isDarkMode),
+                  _buildDetailRow(Icons.person, 'project_details_dialog.academic_supervision'.tr(), project['supervisor'], isDarkMode),
 
                   const SizedBox(height: 32), // مساحة إضافية قبل الأزرار
 
@@ -129,7 +130,7 @@ class ProjectDetailsDialog extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Navigator.pop(context); // إغلاق النافذة
-                            print('جاري فتح المشروع للقراءة...');
+                            print('project_details_dialog.opening_project'.tr());
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryGreen,
@@ -139,7 +140,7 @@ class ProjectDetailsDialog extends StatelessWidget {
                             elevation: 0,
                           ),
                           icon: const Icon(Icons.menu_book, size: 22),
-                          label: const Text('قراءة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          label: Text('project_details_dialog.read'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -147,7 +148,7 @@ class ProjectDetailsDialog extends StatelessWidget {
                         child: OutlinedButton.icon(
                           onPressed: () {
                             Navigator.pop(context); // إغلاق النافذة
-                            print('جاري تحميل المشروع...');
+                            print('project_details_dialog.downloading_project'.tr());
                           },
                           style: OutlinedButton.styleFrom(
                             foregroundColor: primaryGreen,
@@ -156,7 +157,7 @@ class ProjectDetailsDialog extends StatelessWidget {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           icon: const Icon(Icons.file_download, size: 22),
-                          label: const Text('تحميل', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          label: Text('project_details_dialog.download'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         ),
                       ),
                     ],

@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart'; // 👈 1. استدعاء مكتبة الترجمة
 import 'core/providers/settings_provider.dart';
 import 'features/login/screens/login_screen.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 const Color appPrimaryGreen = Color(0xFF2E7D32);
-void main() {
-  // 3. تغليف التطبيق بالمتحكم لكي يصل لكل الشاشات
+
+void main() async {
+  // 👇 2. سطور تهيئة الترجمة قبل تشغيل التطبيق
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
+  // 👇 3. التغليف المزدوج: EasyLocalization يحيط بـ Provider
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => SettingsProvider(),
-      child: const DigitalLibraryApp(),
+    EasyLocalization(
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      path: 'assets/translations', // مسار مجلد الترجمة الذي أنشأناه
+      fallbackLocale: const Locale('ar'),
+      startLocale: const Locale('ar'), // يمكنك لاحقاً ربطها بالـ SharedPreferences
+      child: ChangeNotifierProvider(
+        create: (context) => SettingsProvider(),
+        child: const DigitalLibraryApp(),
+      ),
     ),
   );
 }
@@ -20,38 +31,25 @@ class DigitalLibraryApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 4. نستدعي المتحكم هنا لقراءة حالة "الوضع المظلم"
     final settings = Provider.of<SettingsProvider>(context);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'المكتبة الرقمية',
-      // ✅ 1. قراءة اللغة الحالية من المتحكم
-      locale: Locale(settings.languageCode),
 
-// ✅ 2. اللغات المدعومة في التطبيق
-      supportedLocales: const [
-        Locale('ar', ''), // العربية
-        Locale('en', ''), // الإنجليزية
-      ],
+      // 👇 4. قراءة تفويضات ولغة التطبيق من easy_localization بدلاً من إدخالها يدوياً
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
 
-// ✅ 3. تفويضات اللغات الخاصة بفلاتر
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-
-      // 5. السحر يحدث هنا: التبديل التلقائي بين الوضعين الفاتح والمظلم
+      // 5. التبديل التلقائي بين الوضعين الفاتح والمظلم بناءً على الـ Provider
       themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
 
-      // -- إعدادات الوضع الفاتح (التي برمجناها سابقاً) --
       // -- إعدادات الوضع الفاتح --
       theme: ThemeData(
         brightness: Brightness.light,
-        scaffoldBackgroundColor: Colors.grey.shade50, // 👈 1. توحيد لون الخلفية الفاتح
+        scaffoldBackgroundColor: Colors.grey.shade50,
         appBarTheme: const AppBarTheme(
-          // ... باقي الكود
           iconTheme: IconThemeData(color: appPrimaryGreen),
           backgroundColor: Colors.white,
           elevation: 0,
@@ -63,15 +61,13 @@ class DigitalLibraryApp extends StatelessWidget {
         ),
       ),
 
-      // -- إعدادات الوضع المظلم (الجديدة) --
       // -- إعدادات الوضع المظلم --
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF121212), // 👈 2. توحيد لون الخلفية المظلم
+        scaffoldBackgroundColor: const Color(0xFF121212),
         appBarTheme: const AppBarTheme(
-          // ... باقي الكود
           iconTheme: IconThemeData(color: appPrimaryGreen),
-          backgroundColor: Color(0xFF1E1E1E), // لون رمادي غامق أنيق
+          backgroundColor: Color(0xFF1E1E1E),
           elevation: 0,
         ),
         tabBarTheme: const TabBarThemeData(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import '../providers/settings_provider.dart';
 import '../../core/widgets/unified_item_card.dart';
@@ -13,7 +14,7 @@ class NotificationsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(settings.languageCode == 'ar' ? 'الإشعارات والتنبيهات' : 'Notifications'),
+        title: Text('notifications_screen.title'.tr()),
         centerTitle: true,
       ),
       body: ListView.builder(
@@ -23,13 +24,17 @@ class NotificationsScreen extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.only(bottom: 12.0),
             child: UnifiedItemCard(
-              title: index == 0 ? 'تحديث نظام المكتبة' : 'إشعار جديد من عمادة الكلية',
-              subtitle: index == 0 ? 'تمت إضافة ميزة التنزيل للمقررات الدراسية - منذ ساعتين' : 'موعد تسليم مشاريع التخرج يقترب - أمس',
+              title: index == 0 
+                  ? 'notifications_screen.system_update_title'.tr() 
+                  : 'notifications_screen.dean_notification_title'.tr(),
+              subtitle: index == 0 
+                  ? 'notifications_screen.system_update_desc'.tr() 
+                  : 'notifications_screen.graduation_projects_desc'.tr(),
               icon: index == 0 ? Icons.campaign : Icons.notifications_active,
               isGridView: false,
               onTap: () {
                 // تفاصيل الإشعار عند الضغط عليه
-                print('تم فتح الإشعار رقم $index');
+                print('notifications_screen.notification_opened_msg'.tr(args: [index.toString()]));
               },
               onDownload: null, // لا نحتاج زر تنزيل هنا، سيظهر سهم الانتقال تلقائياً
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../core/widgets/resource_item_card.dart';
 import '../../../core/widgets/custom_drawer.dart';
 import '../../layout/screens/main_screen.dart';
@@ -28,25 +29,32 @@ class BooksListScreen extends StatefulWidget {
 class _BooksListScreenState extends State<BooksListScreen> {
   @override
   Widget build(BuildContext context) {
-    final bool isProjectsCategory = widget.categoryName.trim() == 'مشاريع التخرج';
+    final bool isProjectsCategory = widget.categoryName.trim() == 'books_list_screen.graduation_projects'.tr();
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     const Color primaryGreen = Color(0xFF2E7D32);
     final Color scaffoldBackgroundColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
 
     // بيانات تجريبية
     final List<Map<String, dynamic>> mockBooks = [
-      {'title': 'مقدمة في هندسة البرمجيات', 'author': 'د. إيان سومرفيل', 'icon': Icons.menu_book},
-      {'title': 'هياكل البيانات والخوارزميات', 'author': 'د. روبرت لايفور', 'icon': Icons.picture_as_pdf},
+      {
+        'title': 'books_list_screen.intro_to_software_eng'.tr(),
+        'author': 'books_list_screen.ian_sommerville'.tr(),
+        'icon': Icons.menu_book
+      },
+      {
+        'title': 'books_list_screen.data_structures_algorithms'.tr(),
+        'author': 'books_list_screen.robert_lafore'.tr(),
+        'icon': Icons.picture_as_pdf
+      },
     ];
 
     final List<Map<String, dynamic>> mockProjects = [
       {
-        'title': 'نظام إدارة مكتبة كلية المجتمع',
-        'students': 'أحمد سعيد، يوسف أحمد',
-        'supervisor': 'د. خالد الشيباني',
+        'title': 'books_list_screen.library_management_system'.tr(),
+        'students': 'books_list_screen.students_names'.tr(),
+        'supervisor': 'books_list_screen.khaled_al_shaibani'.tr(),
         'year': '2026',
-        'description': 'نظام متكامل لإدارة الموارد الأكاديمية والكتب الإلكترونية والمشاريع السابقة، مع نظام صلاحيات يفصل بين الطلاب والمعلمين، مبني باستخدام Flutter و PHP.',
+        'description': 'books_list_screen.project_description'.tr(),
         'image': 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000&auto=format&fit=crop',
       },
     ];
@@ -99,7 +107,7 @@ class _BooksListScreenState extends State<BooksListScreen> {
               child: TextField(
                 style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87, fontSize: 14, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  hintText: isArabic ? 'ابحث في ${widget.categoryName}...' : 'Search in ${widget.categoryName}...',
+                  hintText: 'books_list_screen.search_hint'.tr(args: [widget.categoryName]),
                   hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontFamily: 'Cairo'),
                   prefixIcon: const Icon(Icons.search, color: primaryGreen, size: 20),
                   border: InputBorder.none,
@@ -119,7 +127,9 @@ class _BooksListScreenState extends State<BooksListScreen> {
 
                 return ResourceItemCard(
                   title: item['title'],
-                  subtitle: isProjectsCategory ? 'إشراف: ${item['supervisor']}' : item['author'],
+                  subtitle: isProjectsCategory 
+                      ? 'books_list_screen.supervised_by'.tr(args: [item['supervisor']]) 
+                      : item['author'],
                   icon: isProjectsCategory ? Icons.architecture : item['icon'],
 
                   // 👇 إخفاء الثلاث نقاط تماماً عن الجميع داخل المكتبة بتمرير UserRole.student
@@ -132,10 +142,10 @@ class _BooksListScreenState extends State<BooksListScreen> {
                         builder: (context) => ProjectDetailsDialog(project: item),
                       );
                     } else {
-                      print('فتح المرجع: ${item['title']}');
+                      print('books_list_screen.open_resource_msg'.tr(args: [item['title']]));
                     }
                   },
-                  onDownload: () => print('تنزيل: ${item['title']}'),
+                  onDownload: () => print('books_list_screen.downloading_msg'.tr(args: [item['title']])),
                 );
               },
             ),
@@ -162,7 +172,7 @@ class _BooksListScreenState extends State<BooksListScreen> {
         },
         backgroundColor: primaryGreen,
         icon: const Icon(Icons.cloud_upload, color: Colors.white),
-        label: const Text('رفع مرجع', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
+        label: Text('books_list_screen.upload_resource'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
       )
           : null,
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 // 👇 1. تعريف أنواع القيود المتاحة في التطبيق كله
 enum UploadRestriction {
@@ -46,14 +47,14 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
   void _pickFile() {
     String allowedExtensions = '';
     if (widget.restriction == UploadRestriction.pdfOnly) {
-      allowedExtensions = 'PDF فقط';
+      allowedExtensions = 'smart_upload_bottom_sheet.pdf_only'.tr();
     } else if (widget.restriction == UploadRestriction.pdfAndImages) {
-      allowedExtensions = 'PDF أو صور (JPG, PNG)';
+      allowedExtensions = 'smart_upload_bottom_sheet.pdf_and_images'.tr();
     }
 
-    print('فتح ملفات الهاتف... المسموح: $allowedExtensions');
+    print('smart_upload_bottom_sheet.picking_files_msg'.tr(args: [allowedExtensions]));
     setState(() {
-      _selectedFileName = 'ملف_تجريبي.pdf';
+      _selectedFileName = 'smart_upload_bottom_sheet.demo_file_name'.tr();
     });
   }
 
@@ -86,7 +87,9 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
             const SizedBox(height: 20),
 
             Text(
-              isEditMode ? 'تعديل في ${widget.categoryName}' : 'رفع مورد جديد (${widget.categoryName})',
+              isEditMode 
+                ? 'smart_upload_bottom_sheet.edit_mode_title'.tr(args: [widget.categoryName]) 
+                : 'smart_upload_bottom_sheet.upload_mode_title'.tr(args: [widget.categoryName]),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -99,7 +102,7 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
-                labelText: 'عنوان المورد',
+                labelText: 'smart_upload_bottom_sheet.resource_title_label'.tr(),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 prefixIcon: const Icon(Icons.title),
               ),
@@ -112,8 +115,8 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
                 controller: _linkController,
                 keyboardType: TextInputType.url,
                 decoration: InputDecoration(
-                  labelText: 'رابط يوتيوب',
-                  hintText: 'https://youtube.com/...',
+                  labelText: 'smart_upload_bottom_sheet.youtube_link_label'.tr(),
+                  hintText: 'smart_upload_bottom_sheet.youtube_hint'.tr(),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   prefixIcon: const Icon(Icons.ondemand_video, color: Colors.red),
                 ),
@@ -134,7 +137,7 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
                       Icon(Icons.cloud_upload_outlined, size: 40, color: primaryGreen),
                       const SizedBox(height: 10),
                       Text(
-                        _selectedFileName ?? 'اضغط لاختيار ملف',
+                        _selectedFileName ?? 'smart_upload_bottom_sheet.pick_file_hint'.tr(),
                         style: TextStyle(
                           color: _selectedFileName != null ? primaryGreen : Colors.grey.shade600,
                           fontWeight: FontWeight.bold,
@@ -143,8 +146,8 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
                       const SizedBox(height: 5),
                       Text(
                         widget.restriction == UploadRestriction.pdfOnly
-                            ? 'الصيغ المسموحة: PDF فقط'
-                            : 'الصيغ المسموحة: PDF, JPG, PNG',
+                            ? 'smart_upload_bottom_sheet.allowed_formats_pdf'.tr()
+                            : 'smart_upload_bottom_sheet.allowed_formats_all'.tr(),
                         style: const TextStyle(fontSize: 11, color: Colors.grey),
                       ),
                     ],
@@ -164,7 +167,7 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
                 child: Text(
-                  isEditMode ? 'حفظ التعديلات' : 'رفع المورد',
+                  isEditMode ? 'smart_upload_bottom_sheet.save_changes'.tr() : 'smart_upload_bottom_sheet.upload_resource'.tr(),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),

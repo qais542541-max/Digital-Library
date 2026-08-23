@@ -8,8 +8,8 @@ class SettingsProvider extends ChangeNotifier {
   bool _isDarkMode = false;
   bool _generalNotifications = true;
   bool _physicalBookAlerts = true;
-  String _languageCode = 'ar'; // اللغة الافتراضية هي العربية
-  String get languageCode => _languageCode;
+
+  // 👈 (تم مسح المتغيرات الخاصة باللغة من هنا)
 
   // 2. توفير طريقة للواجهات (الشاشات) لقراءة هذه القيم
   bool get isDarkMode => _isDarkMode;
@@ -30,14 +30,15 @@ class SettingsProvider extends ChangeNotifier {
   // دالة قراءة البيانات من ذاكرة الهاتف
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    _languageCode = prefs.getString('languageCode') ?? 'ar';
+
+    // 👈 (تم مسح قراءة اللغة من SharedPreferences لأن easy_localization تتكفل بذلك)
 
     // إذا لم يجد قيمة سابقة، سيعتبر الوضع المظلم false (فاتح)
     _isDarkMode = prefs.getBool('isDarkMode') ?? false;
     _generalNotifications = prefs.getBool('generalNotifications') ?? true;
     _physicalBookAlerts = prefs.getBool('physicalBookAlerts') ?? true;
 
-//جلب بيانات السنة والترم
+    //جلب بيانات السنة والترم
     _academicYear = prefs.getString('academicYear') ?? 'السنة الثالثة';
     _academicTermIndex = prefs.getInt('academicTermIndex') ?? 0;
 
@@ -66,14 +67,10 @@ class SettingsProvider extends ChangeNotifier {
     await prefs.setBool('physicalBookAlerts', value);
     notifyListeners();
   }
-  Future<void> changeLanguage(String code) async {
-    if (_languageCode == code) return; // إذا اختار نفس اللغة لا تفعل شيئاً
-    _languageCode = code;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('languageCode', code);
-    notifyListeners(); // تنبيه التطبيق بالكامل لتغيير الاتجاه
-  }
-//دالتين حفظ وضع السنة والترم
+
+  // 👈 (تم مسح دالة changeLanguage من هنا)
+
+  //دالتين حفظ وضع السنة والترم
   Future<void> changeAcademicYear(String year) async {
     if (_academicYear == year) return;
     _academicYear = year;

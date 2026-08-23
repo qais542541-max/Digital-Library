@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import '../../core/providers/settings_provider.dart';
 
@@ -10,11 +11,10 @@ class AboutScreen extends StatelessWidget {
     const Color primaryGreen = Color(0xFF2E7D32);
     final settings = Provider.of<SettingsProvider>(context);
     final isDarkMode = settings.isDarkMode;
-    final isArabic = settings.languageCode == 'ar';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isArabic ? 'من نحن' : 'About Us'),
+        title: Text('about_screen.title'.tr()),
         centerTitle: true,
         elevation: 0,
       ),
@@ -47,7 +47,7 @@ class AboutScreen extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        isArabic ? 'مكتبة كلية المجتمع صنعاء' : 'Sanaa Community College Library',
+                        'about_screen.library_name'.tr(),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -59,9 +59,7 @@ class AboutScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  isArabic
-                      ? 'تُعد المكتبة الرقمية لكلية المجتمع صنعاء من أبرز المكتبات الأكاديمية في اليمن، حيث تسعى لتقديم أفضل الخدمات المكتبية لطلاب الكلية وأعضاء هيئة التدريس والباحثين. نحن نفر الوصل إلى مجموعة واسعة من الكتب والمصادر الرقمية والأكاديمية لدعم العملية التعليمية والبحثية.\n\nتأسست المكتبة بهدف أساسي هو توفير بيئة تعليمية غنية بالموارد المعرفية، حيث نحرص على تحديث مكتباتنا باستمرار لإضافة أحدث الإصدارات والكتب المرجع في مجالات المجتمع المختلفة.'
-                      : 'The Digital Library of Sanaa Community College is one of the premier academic libraries in Yemen, striving to provide the best library services to college students, faculty members, and researchers.',
+                  'about_screen.description'.tr(),
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.8,
@@ -77,20 +75,17 @@ class AboutScreen extends StatelessWidget {
           _buildValueCard(
             context,
             icon: Icons.visibility,
-            title: isArabic ? 'رؤيتنا' : 'Our Vision',
-            text: isArabic
-                ? 'أن نكون مركزاً للتميز في تقديم الخدمات المكتبية والبحثية، والمساهمة في دعم العملية التعليمية والبحثية، ومواكبة التطورات التقنية في مجال المعلومات.'
-                : 'To be a center of excellence in providing library and research services.',
+            title: 'about_screen.vision_title'.tr(),
+            text: 'about_screen.vision_text'.tr(),
             isDarkMode: isDarkMode,
             primaryColor: primaryGreen,
           ),
           const SizedBox(height: 16),
           _buildValueCard(
             context,
-            icon: Icons.track_changes,            title: isArabic ? 'رسالتنا' : 'Our Mission',
-            text: isArabic
-                ? 'توفر المصادر المعلوماتية والخدمات المكتبية عالية الجودة لدعم البحث العلمي والتعلم المستمر، وتلبية احتياجات المستخدمين بأحدث التقنيات.'
-                : 'Providing high-quality informational resources and library services.',
+            icon: Icons.track_changes,
+            title: 'about_screen.mission_title'.tr(),
+            text: 'about_screen.mission_text'.tr(),
             isDarkMode: isDarkMode,
             primaryColor: primaryGreen,
           ),
@@ -98,10 +93,8 @@ class AboutScreen extends StatelessWidget {
           _buildValueCard(
             context,
             icon: Icons.diamond_outlined,
-            title: isArabic ? 'قيمنا' : 'Our Values',
-            text: isArabic
-                ? 'الجودة والابتكار والتعاون وخدمة المجتمع الأكاديمي باحترام ومهنية عالية، مع الالتزام بأعلى معايير الخدمة.'
-                : 'Quality, innovation, cooperation, and serving the academic community.',
+            title: 'about_screen.values_title'.tr(),
+            text: 'about_screen.values_text'.tr(),
             isDarkMode: isDarkMode,
             primaryColor: primaryGreen,
           ),
@@ -121,21 +114,22 @@ class AboutScreen extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  isArabic ? 'إحصائيات المكتبة' : 'Library Statistics',
+                  'about_screen.stats_title'.tr(),
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 const SizedBox(height: 20),
                 GridView.count(
                   crossAxisCount: 2,
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),                  childAspectRatio: 2.2,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 2.2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                   children: [
-                    _buildStatItem('+50,000', isArabic ? 'كتاب رقمي' : 'Digital Books'),
-                    _buildStatItem('+2,000', isArabic ? 'طالب عضو' : 'Member Students'),
-                    _buildStatItem('+500', isArabic ? 'مصدر أكاديمي' : 'Academic Source'),
-                    _buildStatItem('24/7', isArabic ? 'خدمة متاحة' : 'Available Service'),
+                    _buildStatItem('+50,000', 'about_screen.stat_digital_books'.tr()),
+                    _buildStatItem('+2,000', 'about_screen.stat_member_students'.tr()),
+                    _buildStatItem('+500', 'about_screen.stat_academic_source'.tr()),
+                    _buildStatItem('24/7', 'about_screen.stat_available_service'.tr()),
                   ],
                 ),
               ],

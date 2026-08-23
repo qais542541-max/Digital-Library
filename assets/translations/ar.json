@@ -1,0 +1,318 @@
+{
+  "advanced_search_bottom_sheet": {
+    "advanced_search_physical": "البحث المتقدم (المكتبة الورقية)",
+    "advanced_search_digital": "البحث المتقدم (المكتبة الرقمية)",
+    "category": "التصنيف",
+    "author_name": "اسم المؤلف",
+    "availability_status": "حالة التوفر",
+    "publish_year": "سنة النشر",
+    "book_language": "لغة الكتاب",
+    "sort_results_by": "ترتيب النتائج حسب:",
+    "cancel": "إلغاء",
+    "apply_search": "تطبيق البحث",
+    "all": "الكل",
+    "available": "متاح",
+    "borrowed": "مُعار",
+    "arabic": "عربي",
+    "english": "English",
+    "most_relevant": "الأكثر مطابقة",
+    "newest": "الأحدث",
+    "oldest": "الأقدم",
+    "most_read": "الأكثر قراءة",
+    "references": "مراجع",
+    "study_aids": "مناهج مساعدة",
+    "computer_science": "علوم حاسوب",
+    "history": "تاريخ",
+    "novels": "روايات"
+  },
+  "custom_drawer": {
+    "guest_user": "زائر (ضيف)",
+    "browse_without_account": "تصفح المكتبة بدون حساب",
+    "student_name": "عمار العقبي",
+    "student_level": "طالب - مستوى ثالث",
+    "teacher_name": "د. أحمد الشيباني",
+    "faculty_member": "عضو هيئة تدريس",
+    "employee_name": "يوسف شمسان",
+    "library_management": "إدارة المكتبة",
+    "external_researcher_name": "محمد أحمد",
+    "external_researcher": "باحث خارجي",
+    "profile": "الملف الشخصي",
+    "my_downloads": "تحميلاتي",
+    "favorites": "مفضلاتي",
+    "login_required_favorites": "يرجى تسجيل الدخول أو إنشاء حساب لحفظ مفضلاتك!",
+    "about_us": "من نحن",
+    "settings": "الإعدادات",
+    "login_signup": "تسجيل الدخول / إنشاء حساب",
+    "logout": "تسجيل الخروج"
+  },
+
+  "notifications_screen": {
+    "title": "الإشعارات والتنبيهات",
+    "system_update_title": "تحديث نظام المكتبة",
+    "dean_notification_title": "إشعار جديد من عمادة الكلية",
+    "system_update_desc": "تمت إضافة ميزة التنزيل للمقررات الدراسية - منذ ساعتين",
+    "graduation_projects_desc": "موعد تسليم مشاريع التخرج يقترب - أمس",
+    "notification_opened_msg": "تم فتح الإشعار رقم {}"
+  },
+
+  "project_details_dialog": {
+    "class_of": "دفعة {}",
+    "about_project": "نبذة عن المشروع:",
+    "no_additional_details": "لا توجد تفاصيل إضافية لهذا المشروع.",
+    "prepared_by": "إعداد الطلاب:",
+    "academic_supervision": "إشراف أكاديمي:",
+    "read": "قراءة",
+    "download": "تحميل",
+    "opening_project": "جاري فتح المشروع للقراءة...",
+    "downloading_project": "جاري تحميل المشروع..."
+  },
+
+  "resource_item_card": {
+    "edit": "تعديل",
+    "delete": "حذف"
+  },
+
+  "smart_upload_bottom_sheet": {
+    "pdf_only": "PDF فقط",
+    "pdf_and_images": "PDF أو صور (JPG, PNG)",
+    "picking_files_msg": "فتح ملفات الهاتف... المسموح: {}",
+    "demo_file_name": "ملف_تجريبي.pdf",
+    "edit_mode_title": "تعديل في {}",
+    "upload_mode_title": "رفع مورد جديد ({})",
+    "resource_title_label": "عنوان المورد",
+    "youtube_link_label": "رابط يوتيوب",
+    "youtube_hint": "https://youtube.com/...",
+    "pick_file_hint": "اضغط لاختيار ملف",
+    "allowed_formats_pdf": "الصيغ المسموحة: PDF فقط",
+    "allowed_formats_all": "الصيغ المسموحة: PDF, JPG, PNG",
+    "save_changes": "حفظ التعديلات",
+    "upload_resource": "رفع المورد"
+  },
+
+  "unified_item_card": {},
+
+  "about_screen": {
+    "title": "من نحن",
+    "library_name": "مكتبة كلية المجتمع صنعاء",
+    "description": "تُعد المكتبة الرقمية لكلية المجتمع صنعاء من أبرز المكتبات الأكاديمية في اليمن، حيث تسعى لتقديم أفضل الخدمات المكتبية لطلاب الكلية وأعضاء هيئة التدريس والباحثين. نحن نوفر الوصول إلى مجموعة واسعة من الكتب والمصادر الرقمية والأكاديمية لدعم العملية التعليمية والبحثية.\n\nتأسست المكتبة بهدف أساسي هو توفير بيئة تعليمية غنية بالموارد المعرفية، حيث نحرص على تحديث مكتباتنا باستمرار لإضافة أحدث الإصدارات والكتب المرجع في مجالات المجتمع المختلفة.",
+    "vision_title": "رؤيتنا",
+    "vision_text": "أن نكون مركزاً للتميز في تقديم الخدمات المكتبية والبحثية، والمساهمة في دعم العملية التعليمية والبحثية، ومواكبة التطورات التقنية في مجال المعلومات.",
+    "mission_title": "رسالتنا",
+    "mission_text": "توفير المصادر المعلوماتية والخدمات المكتبية عالية الجودة لدعم البحث العلمي والتعلم المستمر، وتلبية احتياجات المستخدمين بأحدث التقنيات.",
+    "values_title": "قيمنا",
+    "values_text": "الجودة والابتكار والتعاون وخدمة المجتمع الأكاديمي باحترام ومهنية عالية، مع الالتزام بأعلى معايير الخدمة.",
+    "stats_title": "إحصائيات المكتبة",
+    "stat_digital_books": "كتاب رقمي",
+    "stat_member_students": "طالب عضو",
+    "stat_academic_source": "مصدر أكاديمي",
+    "stat_available_service": "خدمة متاحة"
+  },
+
+  "ai_assistant_screen": {
+    "title": "المساعد الذكي",
+    "welcome_msg": "أهلاً بك! كيف يمكنني مساعدتك في دراستك اليوم؟",
+    "user_query_example": "أين أجد ملزمة جودة البرمجيات؟",
+    "ai_response_example": "ملزمة جودة البرمجيات موجودة في قسم: السنة الثالثة ⬅️ الترم الأول. هل تريدني أن أنقلك إليها مباشرة؟",
+    "input_hint": "اسأل عن أي مادة أو ملزمة...",
+    "send_button_pressed": "تم الضغط على زر الإرسال"
+  },
+
+  "my_courses_screen": {
+    "first_year": "السنة الأولى",
+    "second_year": "السنة الثانية",
+    "third_year": "السنة الثالثة",
+    "fourth_year": "السنة الرابعة",
+    "academic_year_label": "المستوى الدراسي:",
+    "teaching_year_label": "سنة التدريس:",
+    "software_project_management": "إدارة المشاريع البرمجية ({})",
+    "eng_khaled": "م. خالد",
+    "mobile_programming": "برمجة تطبيقات الهاتف",
+    "dr_ali": "د. علي",
+    "search_hint": "ابحث عن مقرر...",
+    "first_term": "الترم الأول",
+    "second_term": "الترم الثاني"
+  },
+
+  "subject_details_screen": {
+    "handouts": "الملازم",
+    "lectures": "المحاضرات",
+    "forms": "النماذج",
+    "delete_confirmation_title": "تأكيد الحذف",
+    "delete_confirmation_message": "هل أنت متأكد من حذف \"{}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "upload_resource": "رفع مورد",
+    "mock_author": "أ. محمد / د. أحمد",
+    "resource_item_title": "{} {}",
+    "previous_file_name": "ملف_سابق.pdf"
+  },
+
+  "downloads_screen": {
+    "title": "تحميلاتي",
+    "no_files": "لا توجد ملفات محملة حالياً",
+    "delete_confirm_title": "تأكيد الحذف",
+    "delete_confirm_msg": "هل أنت متأكد من حذف هذا الملف نهائياً من جهازك؟",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "item_deleted_msg": "تم حذف: {}",
+    "undo": "تراجع",
+    "already_downloaded": "الملف محمل مسبقاً",
+    "cpp_book_title": "كتاب البرمجة بلغة C++",
+    "pdf_file_size": "ملف PDF - 2.5 MB",
+    "db_notes_title": "مذكرة قواعد البيانات",
+    "doc_file_size": "مستند - 1.2 MB"
+  },
+
+  "favorites_screen": {
+    "title": "مفضلاتي",
+    "no_items": "لا توجد عناصر في المفضلة حالياً",
+    "remove_dialog_title": "إزالة من التفضيلات",
+    "remove_dialog_content": "ما الإجراء الذي تريد اتخاذه تجاه هذا المورد؟",
+    "cancel": "إلغاء",
+    "remove_only": "إزالة من التفضيلات",
+    "remove_and_delete": "إزالة وحذف",
+    "removed_from_favorites": "تمت الإزالة من التفضيلات: {}",
+    "removed_and_deleted": "تمت الإزالة والحذف من الجهاز: {}",
+    "java_book_title": "البرمجة بلغة جافا",
+    "java_book_subtitle": "مادة: مقدمة في البرمجة",
+    "algorithms_lecture_title": "محاضرة الخوارزميات",
+    "algorithms_lecture_subtitle": "مادة: هياكل البيانات"
+  },
+
+  "general_main_screen": {
+    "title": "الرئيسية",
+    "welcome_msg": "مرحباً، {}! 👋",
+    "role": "الصفة: {}",
+    "learn_today": "ماذا تريد أن تتعلم اليوم؟",
+    "search_hint": "ابحث عن ملازم، مشاريع، محاضرات...",
+    "lectures": "المحاضرات",
+    "projects": "المشاريع",
+    "books": "الكتب",
+    "news": "الإعلانات",
+    "recently_added": "أحدث الإضافات للمكتبة",
+    "advanced_programming": "ملزمة برمجة متقدمة",
+    "doctor_name": "د. أحمد محمد",
+    "college_news": "أخبار وإعلانات الكلية",
+    "defense_title": "موعد مناقشة مشاريع التخرج",
+    "defense_desc": "تم تحديد موعد مناقشة مشاريع التخرج للدفعة الحالية...",
+    "need_help": "هل تحتاج إلى مساعدة؟",
+    "support_team": "فريق الدعم في مكتبة كلية المجتمع جاهز لخدمتك",
+    "call": "اتصال",
+    "location": "الموقع",
+    "email": "مراسلة",
+    "copyright": "© 2026 المكتبة الرقمية - كلية المجتمع صنعاء",
+    "calling": "جاري الاتصال...",
+    "opening_map": "جاري فتح الخريطة...",
+    "opening_email": "جاري فتح الإيميل..."
+  },
+
+  "main_screen": {
+    "student": "طالب",
+    "teacher": "معلم",
+    "employee": "موظف",
+    "external_researcher": "باحث خارجي",
+    "guest": "ضيف",
+    "home": "الرئيسية",
+    "my_courses": "مقرراتي",
+    "library": "المكتبة",
+    "assistant": "المساعد"
+  },
+
+  "books_list_screen": {
+    "graduation_projects": "مشاريع التخرج",
+    "intro_to_software_eng": "مقدمة في هندسة البرمجيات",
+    "ian_sommerville": "د. إيان سومرفيل",
+    "data_structures_algorithms": "هياكل البيانات والخوارزميات",
+    "robert_lafore": "د. روبرت لايفور",
+    "library_management_system": "نظام إدارة مكتبة كلية المجتمع",
+    "students_names": "أحمد سعيد، يوسف أحمد",
+    "khaled_al_shaibani": "د. خالد الشيباني",
+    "project_description": "نظام متكامل لإدارة الموارد الأكاديمية والكتب الإلكترونية والمشاريع السابقة، مع نظام صلاحيات يفصل بين الطلاب والمعلمين، مبني باستخدام Flutter و PHP.",
+    "search_hint": "ابحث في {}...",
+    "supervised_by": "إشراف: {}",
+    "open_resource_msg": "فتح المرجع: {}",
+    "downloading_msg": "تنزيل: {}",
+    "upload_resource": "رفع مرجع"
+  },
+
+
+  "general_library_screen": {
+    "title": "المكتبة العامة",
+    "search_hint": "ابحث في المكتبة...",
+    "physical_library": "المكتبة الورقية",
+    "digital_library": "المكتبة الرقمية",
+    "graduation_projects": "مشاريع التخرج",
+    "graduation_projects_subtitle": "أرشيف مشاريع الدفع السابقة",
+    "programming_references": "مراجع برمجية وتقنية",
+    "programming_references_subtitle": "كتب ولغات برمجة"
+  },
+  "pdf_viewer_screen": {},
+
+
+  "change_password_screen": {
+    "title_step_1": "تغيير كلمة المرور",
+    "title_step_2": "إدخال رمز التحقق",
+    "title_step_3": "كلمة المرور الجديدة",
+    "current_password": "كلمة المرور الحالية",
+    "new_password": "كلمة المرور الجديدة",
+    "forgot_password": "نسيت كلمة المرور؟",
+    "verification_code_sent": "تم إرسال رمز تحقق مكون من 4 أرقام إلى بريدك الإلكتروني.",
+    "enter_and_confirm_new_password": "الرجاء إدخال كلمة المرور الجديدة وتأكيدها.",
+    "confirm_password": "تأكيد كلمة المرور",
+    "cancel": "إلغاء",
+    "password_updated_successfully": "تم تحديث كلمة المرور بنجاح",
+    "verify": "تحقق",
+    "save": "حفظ"
+  },
+
+
+  "profile_screen": {
+    "title": "الملف الشخصي",
+    "student_id": "الرقم الجامعي",
+    "employee_id": "الرقم الوظيفي",
+    "major": "التخصص",
+    "computer_programming": "برمجة حاسوب",
+    "academic_year": "المستوى الدراسي",
+    "current_term": "الترم الحالي",
+    "first_term": "الترم الأول",
+    "second_term": "الترم الثاني",
+    "full_name": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone_number": "رقم الهاتف",
+    "success_msg": "تم تحديث بياناتك بنجاح",
+    "save_changes": "حفظ التغييرات",
+    "first_year": "السنة الأولى",
+    "second_year": "السنة الثانية",
+    "third_year": "السنة الثالثة",
+    "fourth_year": "السنة الرابعة",
+    "mock_name": "عمار العقبي"
+  },
+
+  "settings_screen": {
+    "title": "الإعدادات",
+    "account_section": "الحساب",
+    "profile": "الملف الشخصي",
+    "edit_student_data": "تعديل بيانات الطالب",
+    "change_password": "تغيير كلمة المرور",
+    "update_password_desc": "تحديث الرمز السري لحسابك",
+    "preferences_section": "التفضيلات والإشعارات",
+    "app_language": "لغة التطبيق",
+    "arabic": "العربية",
+    "english": "English",
+    "dark_mode": "الوضع المظلم",
+    "new_resources_notifications": "إشعارات الموارد الجديدة",
+    "new_resources_notifications_desc": "تنبيه عند رفع ملازم أو تكاليف جديدة",
+    "physical_library_alerts": "تنبيهات المكتبة الفعلية",
+    "physical_library_alerts_desc": "تذكير بمواعيد إرجاع الكتب الورقية",
+    "storage_section": "التخزين والبيانات",
+    "clear_cache": "مسح الذاكرة المؤقتة (Cache)",
+    "clear_cache_desc": "توفير مساحة التخزين في الهاتف",
+    "clear_cache_success": "تم مسح الذاكرة المؤقتة بنجاح",
+    "other_section": "أخرى",
+    "about_app": "حول التطبيق",
+    "version": "الإصدار {}",
+    "choose_language": "اختر لغة التطبيق"
+  }
+
+
+}

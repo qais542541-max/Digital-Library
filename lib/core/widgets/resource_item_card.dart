@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../features/layout/screens/main_screen.dart';
 
 class ResourceItemCard extends StatelessWidget {
@@ -114,8 +115,26 @@ class ResourceItemCard extends StatelessWidget {
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         itemBuilder: (context) => [
-                          const PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit, color: Colors.blue, size: 20), SizedBox(width: 8), Text('تعديل')])),
-                          const PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 20), SizedBox(width: 8), Text('حذف')])),
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.edit, color: Colors.blue, size: 20),
+                                const SizedBox(width: 8),
+                                Text('resource_item_card.edit'.tr())
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.delete, color: Colors.red, size: 20),
+                                const SizedBox(width: 8),
+                                Text('resource_item_card.delete'.tr())
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ],

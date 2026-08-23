@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/widgets/unified_item_card.dart';
 import '../../../core/widgets/notifications_screen.dart';
-import '../../layout/screens/main_screen.dart'; // ملف الـ UserRole
+import '../../layout/screens/main_screen.dart';
 import 'subject_details_screen.dart';
 
 class MyCoursesScreen extends StatelessWidget {
@@ -16,20 +17,40 @@ class MyCoursesScreen extends StatelessWidget {
     final settings = Provider.of<SettingsProvider>(context);
     final selectedYear = settings.academicYear;
     final isDarkMode = settings.isDarkMode;
-    final isArabic = settings.languageCode == 'ar';
+    final isArabic = context.locale.languageCode == 'ar';
     const Color primaryGreen = Color(0xFF2E7D32);
 
-    final List<String> years = ['السنة الأولى', 'السنة الثانية', 'السنة الثالثة', 'السنة الرابعة'];
+    // 👇 1. نحتفظ بالمفاتيح الثابتة (Keys) برمجياً ولا نترجمها هنا
+    final List<String> yearKeys = [
+      'my_courses_screen.first_year',
+      'my_courses_screen.second_year',
+      'my_courses_screen.third_year',
+      'my_courses_screen.fourth_year'
+    ];
+
+    // 👇 2. حماية ذكية: إذا كانت الذاكرة تحمل نصاً عربياً قديماً (مثل "السنة الثالثة")، نرجع للمفتاح الافتراضي حتى لا ينكسر التطبيق
+    String currentYearValue = yearKeys.contains(selectedYear) ? selectedYear : yearKeys[2];
 
     final String yearLabel = role == UserRole.student
-        ? (isArabic ? 'المستوى الدراسي:' : 'Academic Year:')
-        : (isArabic ? 'سنة التدريس:' : 'Teaching Year:');
+        ? 'my_courses_screen.academic_year_label'.tr()
+        : 'my_courses_screen.teaching_year_label'.tr();
 
     final List<Map<String, dynamic>> term1Courses = [
-      {'id': 1, 'title': 'إدارة المشاريع البرمجية ($selectedYear)', 'doctor': 'م. خالد', 'icon': Icons.computer},
+      {
+        'id': 1,
+        // 👇 3. قمنا بإضافة .tr() للمتغير لكي يظهر للمستخدم مترجماً بشكل صحيح داخل النص
+        'title': 'my_courses_screen.software_project_management'.tr(args: [currentYearValue.tr()]),
+        'doctor': 'my_courses_screen.eng_khaled'.tr(),
+        'icon': Icons.computer
+      },
     ];
     final List<Map<String, dynamic>> term2Courses = [
-      {'id': 4, 'title': 'برمجة تطبيقات الهاتف', 'doctor': 'د. علي', 'icon': Icons.phone_android},
+      {
+        'id': 4,
+        'title': 'my_courses_screen.mobile_programming'.tr(),
+        'doctor': 'my_courses_screen.dr_ali'.tr(),
+        'icon': Icons.phone_android
+      },
     ];
 
     return DefaultTabController(
@@ -38,7 +59,6 @@ class MyCoursesScreen extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            // 1. الترويسة المخصصة (أيقونات + قائمة منسدلة مصغرة)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
               child: Row(
@@ -48,39 +68,42 @@ class MyCoursesScreen extends StatelessWidget {
                     icon: Icon(Icons.menu, color: isDarkMode ? Colors.white : Colors.black87),
                     onPressed: () => Scaffold.of(context).openDrawer(),
                   ),
-
-                  // 👇 قائمة السنة / المستوى (تم تصغيرها) 👇
                   Row(
                     children: [
                       Text(
                         yearLabel,
                         style: TextStyle(
-                          fontSize: 12, // 👈 تصغير الخط
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: isDarkMode ? Colors.white : Colors.black87,
+                          fontFamily: 'Cairo',
                         ),
                       ),
-                      const SizedBox(width: 6), // 👈 تقليل المسافة
+                      const SizedBox(width: 6),
                       Container(
-                        height: 32, // 👈 تحديد ارتفاع صغير للقائمة
+                        height: 32,
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         decoration: BoxDecoration(
                           color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-                          borderRadius: BorderRadius.circular(8), // حواف أقل دائرية لتناسب الحجم الصغير
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: primaryGreen.withOpacity(0.5)),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
-                            value: selectedYear,
+                            value: currentYearValue, // 👈 استخدام المتغير المحمي (المفتاح الثابت)
                             dropdownColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
-                            icon: const Icon(Icons.keyboard_arrow_down, color: primaryGreen, size: 18), // 👈 تصغير الأيقونة
+                            icon: const Icon(Icons.keyboard_arrow_down, color: primaryGreen, size: 18),
                             style: TextStyle(
-                              fontSize: 12, // 👈 تصغير الخط الداخلي
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: isDarkMode ? Colors.white : Colors.black87,
                               fontFamily: 'Cairo',
                             ),
-                            items: years.map((String year) => DropdownMenuItem<String>(value: year, child: Text(year))).toList(),
+                            // 👇 4. هنا السحر: القيمة المخزنة هي المفتاح (key) ولكن النص المعروض مترجم (key.tr())
+                            items: yearKeys.map((String key) => DropdownMenuItem<String>(
+                              value: key,
+                              child: Text(key.tr()),
+                            )).toList(),
                             onChanged: (String? newValue) {
                               if (newValue != null) settings.changeAcademicYear(newValue);
                             },
@@ -89,7 +112,6 @@ class MyCoursesScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   IconButton(
                     icon: Icon(Icons.notifications_outlined, color: isDarkMode ? Colors.white : Colors.black87),
                     onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen())),
@@ -97,73 +119,42 @@ class MyCoursesScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            // 👇 2. شريط البحث المتقدم المنفصل والمصغر (Shamela Style) 👇
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-              child: Row(
-                children: [
-                  // زر البحث المتقدم (منفصل)
-                  Container(
-                    height: 45, // نفس ارتفاع شريط البحث
-                    width: 45,
-                    decoration: BoxDecoration(
-                      color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: isDarkMode ? Colors.transparent : Colors.grey.shade300),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.tune, color: primaryGreen, size: 20),
-                      onPressed: () {
-                        // TODO: إظهار نافذة البحث المتقدم
-                      },
-                    ),
+              child: Container(
+                height: 45,
+                decoration: BoxDecoration(
+                  color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: isDarkMode ? Colors.transparent : Colors.grey.shade300),
+                ),
+                child: TextField(
+                  style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87, fontSize: 14, fontFamily: 'Cairo'),
+                  decoration: InputDecoration(
+                    hintText: 'my_courses_screen.search_hint'.tr(),
+                    hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontFamily: 'Cairo'),
+                    prefixIcon: const Icon(Icons.search, color: primaryGreen, size: 20),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  const SizedBox(width: 10), // مسافة بين الزر وشريط البحث
-
-                  // شريط البحث الأساسي
-                  Expanded(
-                    child: Container(
-                      height: 45, // 👈 تحديد ارتفاع نحيف للشريط
-                      decoration: BoxDecoration(
-                        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: isDarkMode ? Colors.transparent : Colors.grey.shade300),
-                      ),
-                      child: TextField(
-                        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87, fontSize: 14),
-                        decoration: InputDecoration(
-                          hintText: isArabic ? 'ابحث عن مقرر...' : 'Search for course...',
-                          hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 13),
-                          prefixIcon: const Icon(Icons.search, color: primaryGreen, size: 20), // 👈 أيقونة أصغر
-                          border: InputBorder.none,
-                          isDense: true, // 👈 يجعل الحقل مدمجاً أكثر
-                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
             const SizedBox(height: 10),
-
-            // 👇 3. شريط التبويبات المدمج (بدون خط سفلي) 👇
             Container(
               color: Colors.transparent,
               child: TabBar(
-                dividerColor: Colors.transparent, // 👈 إزالة الخط الرمادي من هنا
+                dividerColor: Colors.transparent,
                 labelColor: primaryGreen,
                 unselectedLabelColor: Colors.grey,
                 indicatorColor: primaryGreen,
                 tabs: [
-                  Tab(text: isArabic ? 'الترم الأول' : 'First Term'),
-                  Tab(text: isArabic ? 'الترم الثاني' : 'Second Term'),
+                  Tab(text: 'my_courses_screen.first_term'.tr()),
+                  Tab(text: 'my_courses_screen.second_term'.tr()),
                 ],
               ),
             ),
-
-            // 4. عرض محتوى التبويبات
             Expanded(
               child: TabBarView(
                 children: [

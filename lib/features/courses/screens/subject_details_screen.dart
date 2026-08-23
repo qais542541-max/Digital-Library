@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../core/widgets/custom_drawer.dart';
 import '../../layout/screens/main_screen.dart';
 import '../../../core/widgets/resource_item_card.dart';
@@ -26,10 +27,9 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
   late TabController _tabController;
 
   final List<Map<String, dynamic>> subjectCategories = [
-    {'id': 1, 'title': 'الملازم', 'icon': Icons.menu_book},
-    {'id': 2, 'title': 'المحاضرات', 'icon': Icons.ondemand_video},
-    {'id': 3, 'title': 'التكاليف', 'icon': Icons.assignment},
-    {'id': 4, 'title': 'النماذج', 'icon': Icons.quiz},
+    {'id': 1, 'title': 'subject_details_screen.handouts', 'icon': Icons.menu_book},
+    {'id': 2, 'title': 'subject_details_screen.lectures', 'icon': Icons.ondemand_video},
+    {'id': 4, 'title': 'subject_details_screen.forms', 'icon': Icons.quiz},
   ];
 
   // 3. تهيئة المتحكم عند فتح الشاشة 👇
@@ -50,12 +50,12 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('تأكيد الحذف', style: TextStyle(fontFamily: 'Cairo')),
-        content: Text('هل أنت متأكد من حذف "$itemTitle"؟ لا يمكن التراجع عن هذا الإجراء.'),
+        title: Text('subject_details_screen.delete_confirmation_title'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+        content: Text('subject_details_screen.delete_confirmation_message'.tr(args: [itemTitle])),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء', style: TextStyle(color: Colors.grey)),
+            child: Text('subject_details_screen.cancel'.tr(), style: const TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -63,7 +63,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
               print('تم حذف: $itemTitle');
               Navigator.pop(context);
             },
-            child: const Text('حذف', style: TextStyle(color: Colors.white)),
+            child: Text('subject_details_screen.delete'.tr(), style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -110,14 +110,14 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
           indicatorColor: primaryGreen,
           indicatorWeight: 3,
           dividerColor: Colors.transparent,
-          tabs: subjectCategories.map((c) => Tab(text: c['title'])).toList(),
+          tabs: subjectCategories.map((c) => Tab(text: c['title'].toString().tr())).toList(),
         ),
       ),
 
       body: TabBarView(
         controller: _tabController, // 👈 6. ربط المتحكم بمحتوى التبويبات
         children: subjectCategories.map((category) {
-          return _buildFlatCategoryContent(category['id'], category['title'], category['icon'], isDarkMode, primaryGreen);
+          return _buildFlatCategoryContent(category['id'], category['title'].toString().tr(), category['icon'], isDarkMode, primaryGreen);
         }).toList(),
       ),
 
@@ -140,14 +140,14 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
             builder: (context) => SmartUploadBottomSheet(
-              categoryName: subjectCategories[activeIndex]['title'],
+              categoryName: subjectCategories[activeIndex]['title'].toString().tr(),
               restriction: currentRestriction,
             ),
           );
         },
         backgroundColor: primaryGreen,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('رفع مورد', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: Text('subject_details_screen.upload_resource'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       )
           : null,
     );
@@ -157,8 +157,8 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
     final List<Map<String, dynamic>> mockResources = List.generate(
         5,
             (index) => {
-          'title': '$categoryName ${index + 1}',
-          'author': 'أ. محمد / د. أحمد',
+          'title': 'subject_details_screen.resource_item_title'.tr(args: [categoryName, (index + 1).toString()]),
+          'author': 'subject_details_screen.mock_author'.tr(),
           'icon': categoryIcon,
         }
     );
@@ -186,7 +186,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
                   restriction: categoryId == 1 ? UploadRestriction.pdfOnly : (categoryId == 2 ? UploadRestriction.youtubeLink : UploadRestriction.pdfAndImages),
                   initialData: {
                     'title': item['title'],
-                    'fileName': 'ملف_سابق.pdf',
+                    'fileName': 'subject_details_screen.previous_file_name'.tr(),
                   },
                 ),
               );

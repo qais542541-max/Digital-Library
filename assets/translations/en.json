@@ -1,0 +1,317 @@
+{
+  "advanced_search_bottom_sheet": {
+    "advanced_search_physical": "Advanced Search (Physical Library)",
+    "advanced_search_digital": "Advanced Search (Digital Library)",
+    "category": "Category",
+    "author_name": "Author Name",
+    "availability_status": "Availability Status",
+    "publish_year": "Publish Year",
+    "book_language": "Book Language",
+    "sort_results_by": "Sort results by:",
+    "cancel": "Cancel",
+    "apply_search": "Apply Search",
+    "all": "All",
+    "available": "Available",
+    "borrowed": "Borrowed",
+    "arabic": "Arabic",
+    "english": "English",
+    "most_relevant": "Most Relevant",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "most_read": "Most Read",
+    "references": "References",
+    "study_aids": "Study Aids",
+    "computer_science": "Computer Science",
+    "history": "History",
+    "novels": "Novels"
+  },
+
+  "custom_drawer": {
+    "guest_user": "Guest (Visitor)",
+    "browse_without_account": "Browse library without account",
+    "student_name": "Ammar Al-Oqabi",
+    "student_level": "Student - 3rd Level",
+    "teacher_name": "Dr. Ahmed Al-Shaibani",
+    "faculty_member": "Faculty Member",
+    "employee_name": "Yousef Shamsan",
+    "library_management": "Library Management",
+    "external_researcher_name": "Mohammed Ahmed",
+    "external_researcher": "External Researcher",
+    "profile": "Profile",
+    "my_downloads": "My Downloads",
+    "favorites": "Favorites",
+    "login_required_favorites": "Please log in or create an account to save your favorites!",
+    "about_us": "About Us",
+    "settings": "Settings",
+    "login_signup": "Login / Create Account",
+    "logout": "Logout"
+  },
+
+  "notifications_screen": {
+    "title": "Notifications",
+    "system_update_title": "Library System Update",
+    "dean_notification_title": "New notification from the College Dean",
+    "system_update_desc": "Download feature added for courses - 2 hours ago",
+    "graduation_projects_desc": "Graduation projects submission deadline is approaching - Yesterday",
+    "notification_opened_msg": "Notification number {} opened"
+  },
+
+  "project_details_dialog": {
+    "class_of": "Class of {}",
+    "about_project": "About the project:",
+    "no_additional_details": "No additional details for this project.",
+    "prepared_by": "Prepared by:",
+    "academic_supervision": "Academic supervision:",
+    "read": "Read",
+    "download": "Download",
+    "opening_project": "Opening project for reading...",
+    "downloading_project": "Downloading project..."
+  },
+
+  "resource_item_card": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+
+  "smart_upload_bottom_sheet": {
+    "pdf_only": "PDF Only",
+    "pdf_and_images": "PDF or Images (JPG, PNG)",
+    "picking_files_msg": "Opening phone files... Allowed: {}",
+    "demo_file_name": "demo_file.pdf",
+    "edit_mode_title": "Editing in {}",
+    "upload_mode_title": "Upload new resource ({})",
+    "resource_title_label": "Resource Title",
+    "youtube_link_label": "YouTube Link",
+    "youtube_hint": "https://youtube.com/...",
+    "pick_file_hint": "Click to select a file",
+    "allowed_formats_pdf": "Allowed formats: PDF only",
+    "allowed_formats_all": "Allowed formats: PDF, JPG, PNG",
+    "save_changes": "Save Changes",
+    "upload_resource": "Upload Resource"
+  },
+
+  "unified_item_card": {},
+
+  "about_screen": {
+    "title": "About Us",
+    "library_name": "Sanaa Community College Library",
+    "description": "The Digital Library of Sanaa Community College is one of the premier academic libraries in Yemen, striving to provide the best library services to college students, faculty members, and researchers. We provide access to a wide range of books and digital and academic resources to support the educational and research process.\n\nThe library was established with the primary goal of providing a learning environment rich in knowledge resources, as we ensure to constantly update our libraries to add the latest releases and reference books in various academic fields.",
+    "vision_title": "Our Vision",
+    "vision_text": "To be a center of excellence in providing library and research services, contributing to supporting the educational and research process, and keeping pace with technical developments in the field of information.",
+    "mission_title": "Our Mission",
+    "mission_text": "Providing high-quality informational resources and library services to support scientific research and continuous learning, and meeting users' needs with the latest technologies.",
+    "values_title": "Our Values",
+    "values_text": "Quality, innovation, cooperation, and serving the academic community with respect and high professionalism, while adhering to the highest service standards.",
+    "stats_title": "Library Statistics",
+    "stat_digital_books": "Digital Books",
+    "stat_member_students": "Member Students",
+    "stat_academic_source": "Academic Source",
+    "stat_available_service": "Available Service"
+  },
+
+  "ai_assistant_screen": {
+    "title": "Smart Assistant",
+    "welcome_msg": "Welcome! How can I help you with your studies today?",
+    "user_query_example": "Where can I find the Software Quality handout?",
+    "ai_response_example": "The Software Quality handout is located in: Third Year ⬅️ First Semester. Would you like me to take you there directly?",
+    "input_hint": "Ask about any subject or handout...",
+    "send_button_pressed": "Send button pressed"
+  },
+
+  "my_courses_screen": {
+    "first_year": "First Year",
+    "second_year": "Second Year",
+    "third_year": "Third Year",
+    "fourth_year": "Fourth Year",
+    "academic_year_label": "Academic Year:",
+    "teaching_year_label": "Teaching Year:",
+    "software_project_management": "Software Project Management ({})",
+    "eng_khaled": "Eng. Khaled",
+    "mobile_programming": "Mobile Applications Programming",
+    "dr_ali": "Dr. Ali",
+    "search_hint": "Search for course...",
+    "first_term": "First Term",
+    "second_term": "Second Term"
+  },
+
+
+  "subject_details_screen": {
+    "handouts": "Handouts",
+    "lectures": "Lectures",
+    "forms": "Forms",
+    "delete_confirmation_title": "Confirm Delete",
+    "delete_confirmation_message": "Are you sure you want to delete \"{}\"? This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "upload_resource": "Upload Resource",
+    "mock_author": "Mr. Mohammed / Dr. Ahmed",
+    "resource_item_title": "{} {}",
+    "previous_file_name": "previous_file.pdf"
+  },
+
+  "downloads_screen": {
+    "title": "My Downloads",
+    "no_files": "No downloaded files currently",
+    "delete_confirm_title": "Confirm Delete",
+    "delete_confirm_msg": "Are you sure you want to permanently delete this file from your device?",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "item_deleted_msg": "Deleted: {}",
+    "undo": "Undo",
+    "already_downloaded": "File already downloaded",
+    "cpp_book_title": "C++ Programming Book",
+    "pdf_file_size": "PDF File - 2.5 MB",
+    "db_notes_title": "Database Notes",
+    "doc_file_size": "Document - 1.2 MB"
+  },
+
+  "favorites_screen": {
+    "title": "My Favorites",
+    "no_items": "No items in favorites currently",
+    "remove_dialog_title": "Remove from Favorites",
+    "remove_dialog_content": "What action do you want to take regarding this resource?",
+    "cancel": "Cancel",
+    "remove_only": "Remove from Favorites",
+    "remove_and_delete": "Remove and Delete",
+    "removed_from_favorites": "Removed from favorites: {}",
+    "removed_and_deleted": "Removed and deleted from device: {}",
+    "java_book_title": "Java Programming",
+    "java_book_subtitle": "Subject: Introduction to Programming",
+    "algorithms_lecture_title": "Algorithms Lecture",
+    "algorithms_lecture_subtitle": "Subject: Data Structures"
+  },
+
+  "general_main_screen": {
+    "title": "Home",
+    "welcome_msg": "Welcome, {}! 👋",
+    "role": "Role: {}",
+    "learn_today": "What do you want to learn today?",
+    "search_hint": "Search for books, projects, lectures...",
+    "lectures": "Lectures",
+    "projects": "Projects",
+    "books": "Books",
+    "news": "News",
+    "recently_added": "Recently Added to Library",
+    "advanced_programming": "Advanced Programming Handout",
+    "doctor_name": "Dr. Ahmed Mohammed",
+    "college_news": "College News & Announcements",
+    "defense_title": "Graduation Projects Defense Date",
+    "defense_desc": "The defense date for the current batch's graduation projects has been set...",
+    "need_help": "Need Help?",
+    "support_team": "Community College Library support team is ready to serve you",
+    "call": "Call",
+    "location": "Location",
+    "email": "Email",
+    "copyright": "© 2026 Digital Library - Sana'a Community College",
+    "calling": "Calling...",
+    "opening_map": "Opening map...",
+    "opening_email": "Opening email..."
+  },
+
+  "main_screen": {
+    "student": "Student",
+    "teacher": "Teacher",
+    "employee": "Employee",
+    "external_researcher": "External Researcher",
+    "guest": "Guest",
+    "home": "Home",
+    "my_courses": "My Courses",
+    "library": "Library",
+    "assistant": "Assistant"
+  },
+
+  "books_list_screen": {
+    "graduation_projects": "Graduation Projects",
+    "intro_to_software_eng": "Introduction to Software Engineering",
+    "ian_sommerville": "Dr. Ian Sommerville",
+    "data_structures_algorithms": "Data Structures and Algorithms",
+    "robert_lafore": "Dr. Robert Lafore",
+    "library_management_system": "Sanaa Community College Library Management System",
+    "students_names": "Ahmed Saeed, Yousef Ahmed",
+    "khaled_al_shaibani": "Dr. Khaled Al-Shaibani",
+    "project_description": "An integrated system for managing academic resources, e-books, and previous projects, with a permission system that separates students and teachers, built using Flutter and PHP.",
+    "search_hint": "Search in {}...",
+    "supervised_by": "Supervised by: {}",
+    "open_resource_msg": "Opening resource: {}",
+    "downloading_msg": "Downloading: {}",
+    "upload_resource": "Upload Resource"
+  },
+
+  "general_library_screen": {
+    "title": "General Library",
+    "search_hint": "Search library...",
+    "physical_library": "Physical Library",
+    "digital_library": "Digital Library",
+    "graduation_projects": "Graduation Projects",
+    "graduation_projects_subtitle": "Archive of previous batches' projects",
+    "programming_references": "Programming & Technical References",
+    "programming_references_subtitle": "Books and programming languages"
+  },
+
+  "pdf_viewer_screen": {},
+
+  "change_password_screen": {
+    "title_step_1": "Change Password",
+    "title_step_2": "Enter Verification Code",
+    "title_step_3": "New Password",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "forgot_password": "Forgot Password?",
+    "verification_code_sent": "A 4-digit verification code has been sent to your email.",
+    "enter_and_confirm_new_password": "Please enter and confirm your new password.",
+    "confirm_password": "Confirm Password",
+    "cancel": "Cancel",
+    "password_updated_successfully": "Password updated successfully",
+    "verify": "Verify",
+    "save": "Save"
+  },
+
+  "profile_screen": {
+    "title": "Profile",
+    "student_id": "Student ID",
+    "employee_id": "Employee ID",
+    "major": "Major",
+    "computer_programming": "Computer Programming",
+    "academic_year": "Academic Year",
+    "current_term": "Current Term",
+    "first_term": "First Term",
+    "second_term": "Second Term",
+    "full_name": "Full Name",
+    "email": "Email",
+    "phone_number": "Phone Number",
+    "success_msg": "Profile updated successfully",
+    "save_changes": "Save Changes",
+    "first_year": "First Year",
+    "second_year": "Second Year",
+    "third_year": "Third Year",
+    "fourth_year": "Fourth Year",
+    "mock_name": "Ammar Al-Oqabi"
+  },
+
+  "settings_screen": {
+    "title": "Settings",
+    "account_section": "Account",
+    "profile": "Profile",
+    "edit_student_data": "Edit Student Data",
+    "change_password": "Change Password",
+    "update_password_desc": "Update your account password",
+    "preferences_section": "Preferences & Notifications",
+    "app_language": "App Language",
+    "arabic": "العربية",
+    "english": "English",
+    "dark_mode": "Dark Mode",
+    "new_resources_notifications": "New Resource Notifications",
+    "new_resources_notifications_desc": "Alert when new handouts or assignments are uploaded",
+    "physical_library_alerts": "Physical Library Alerts",
+    "physical_library_alerts_desc": "Reminders for returning physical books",
+    "storage_section": "Storage & Data",
+    "clear_cache": "Clear Cache",
+    "clear_cache_desc": "Free up storage space on your phone",
+    "clear_cache_success": "Cache cleared successfully",
+    "other_section": "Other",
+    "about_app": "About App",
+    "version": "Version {}",
+    "choose_language": "Choose App Language"
+  }
+
+}
