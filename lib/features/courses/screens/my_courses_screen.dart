@@ -15,12 +15,10 @@ class MyCoursesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = Provider.of<SettingsProvider>(context);
-    final selectedYear = settings.academicYear;
     final isDarkMode = settings.isDarkMode;
     final isArabic = context.locale.languageCode == 'ar';
     const Color primaryGreen = Color(0xFF2E7D32);
 
-    // 👇 1. نحتفظ بالمفاتيح الثابتة (Keys) برمجياً ولا نترجمها هنا
     final List<String> yearKeys = [
       'my_courses_screen.first_year',
       'my_courses_screen.second_year',
@@ -28,8 +26,25 @@ class MyCoursesScreen extends StatelessWidget {
       'my_courses_screen.fourth_year'
     ];
 
-    // 👇 2. حماية ذكية: إذا كانت الذاكرة تحمل نصاً عربياً قديماً (مثل "السنة الثالثة")، نرجع للمفتاح الافتراضي حتى لا ينكسر التطبيق
-    String currentYearValue = yearKeys.contains(selectedYear) ? selectedYear : yearKeys[2];
+    // 👇 1. جلب القيمة من الذاكرة
+    String rawSavedYear = settings.academicYear;
+    String currentYearValue;
+
+    // 👇 2. خوارزمية تنظيف الذاكرة (معالجة النصوص القديمة بقوة)
+    if (yearKeys.contains(rawSavedYear)) {
+      currentYearValue = rawSavedYear; // إذا كانت مفتاحاً صحيحاً، استخدمها
+    } else {
+      // إذا كانت نصاً عربياً قديماً، نقوم بترجمتها للمفتاح الجديد فوراً
+      switch (rawSavedYear) {
+        case 'السنة الأولى': currentYearValue = yearKeys[0]; break;
+        case 'السنة الثانية': currentYearValue = yearKeys[1]; break;
+        case 'السنة الثالثة': currentYearValue = yearKeys[2]; break;
+        case 'السنة الرابعة': currentYearValue = yearKeys[3]; break;
+        default: currentYearValue = yearKeys[2]; // الافتراضي: السنة الثالثة
+      }
+      // حفظ المفتاح الجديد الصحيح في الذاكرة بهدوء
+      Future.microtask(() => settings.changeAcademicYear(currentYearValue));
+    }
 
     final String yearLabel = role == UserRole.student
         ? 'my_courses_screen.academic_year_label'.tr()
