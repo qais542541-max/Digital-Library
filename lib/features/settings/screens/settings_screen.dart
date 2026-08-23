@@ -24,16 +24,21 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: scaffoldBackgroundColor,
-        leading: const SizedBox(), // تفريغ اليمين
+        leading: const SizedBox(),
         title: Text(
-            'الإعدادات',
+            'settings_screen.title'.tr(),
             style: TextStyle(color: isDarkMode ? Colors.white : primaryGreen, fontWeight: FontWeight.bold, fontFamily: 'Cairo')
         ),
         centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(Icons.arrow_forward_ios, color: isDarkMode ? Colors.white : primaryGreen, size: 20),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MainScreen(role: role, userName: 'عمار')),
+              );
+            },
           ),
           const SizedBox(width: 8),
         ],
@@ -41,21 +46,21 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         children: [
-          // 1. قسم الحساب (مخفي عن الضيف)
+          // 1. قسم الحساب
           if (role != UserRole.guest) ...[
-            _buildSectionHeader('الحساب', primaryGreen),
+            _buildSectionHeader('settings_screen.account'.tr(), primaryGreen),
             _buildListTile(
               Icons.person_outline,
-              'الملف الشخصي',
-              'تعديل بيانات الطالب',
+              'settings_screen.profile'.tr(),
+              'settings_screen.edit_student_data'.tr(),
                   () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(role: role))),
               iconColor: isDarkMode ? Colors.white : Colors.black87,
               textColor: isDarkMode ? Colors.white : Colors.black87,
             ),
             _buildListTile(
               Icons.lock_outline,
-              'تغيير كلمة المرور',
-              'تحديث الرمز السري لحسابك',
+              'settings_screen.change_password'.tr(),
+              'settings_screen.update_password_desc'.tr(),
                   () => showChangePasswordDialog(context, isDarkMode),
               iconColor: isDarkMode ? Colors.white : Colors.black87,
               textColor: isDarkMode ? Colors.white : Colors.black87,
@@ -64,18 +69,18 @@ class SettingsScreen extends StatelessWidget {
           ],
 
           // 2. التفضيلات والإشعارات
-          _buildSectionHeader('التفضيلات والإشعارات', primaryGreen),
+          _buildSectionHeader('settings_screen.preferences_and_notifications'.tr(), primaryGreen),
           _buildListTile(
             Icons.language,
-            'لغة التطبيق',
-            context.locale.languageCode == 'ar' ? 'العربية' : 'English', // 👈 التعديل هنا
-                () => _showLanguageDialog(context, primaryGreen, isDarkMode), // 👈 حذفنا settings من هنا
+            'settings_screen.app_language'.tr(),
+            context.locale.languageCode == 'ar' ? 'settings_screen.arabic'.tr() : 'settings_screen.english'.tr(),
+                () => _showLanguageDialog(context, primaryGreen, isDarkMode),
             iconColor: isDarkMode ? Colors.white : Colors.black87,
             textColor: isDarkMode ? Colors.white : Colors.black87,
           ),
 
           SwitchListTile(
-            title: const Text('الوضع المظلم', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Cairo')),
+            title: Text('settings_screen.dark_mode'.tr(), style: const TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Cairo')),
             secondary: Icon(Icons.dark_mode_outlined, color: isDarkMode ? Colors.white : Colors.black87),
             activeThumbColor: Colors.white,
             activeTrackColor: primaryGreen,
@@ -84,8 +89,8 @@ class SettingsScreen extends StatelessWidget {
           ),
 
           SwitchListTile(
-            title: const Text('إشعارات الموارد الجديدة', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Cairo')),
-            subtitle: const Text('تنبيه عند رفع ملازم أو تكاليف جديدة', style: TextStyle(fontFamily: 'Cairo')),
+            title: Text('settings_screen.new_resource_notifications'.tr(), style: const TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Cairo')),
+            subtitle: Text('settings_screen.new_resource_notifications_desc'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
             secondary: Icon(Icons.notifications_active_outlined, color: isDarkMode ? Colors.white : Colors.black87),
             activeThumbColor: Colors.white,
             activeTrackColor: primaryGreen,
@@ -94,8 +99,8 @@ class SettingsScreen extends StatelessWidget {
           ),
 
           SwitchListTile(
-            title: const Text('تنبيهات المكتبة الفعلية', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Cairo')),
-            subtitle: const Text('تذكير بمواعيد إرجاع الكتب الورقية', style: TextStyle(fontFamily: 'Cairo')),
+            title: Text('settings_screen.physical_library_alerts'.tr(), style: const TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Cairo')),
+            subtitle: Text('settings_screen.physical_library_alerts_desc'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
             secondary: Icon(Icons.menu_book_outlined, color: isDarkMode ? Colors.white : Colors.black87),
             activeThumbColor: Colors.white,
             activeTrackColor: primaryGreen,
@@ -104,13 +109,13 @@ class SettingsScreen extends StatelessWidget {
           ),
           const Divider(height: 30, indent: 20, endIndent: 20),
 
-          // 3. التخزين والبيانات (يحتوي فقط على مسح الذاكرة لتنظيف الواجهة)
-          _buildSectionHeader('التخزين والبيانات', primaryGreen),
+          // 3. التخزين والبيانات
+          _buildSectionHeader('settings_screen.storage_and_data'.tr(), primaryGreen),
           _buildListTile(
-            Icons.delete_outline, 'مسح الذاكرة المؤقتة (Cache)', 'توفير مساحة التخزين في الهاتف', () {
+            Icons.delete_outline, 'settings_screen.clear_cache'.tr(), 'settings_screen.clear_cache_desc'.tr(), () {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم مسح الذاكرة المؤقتة بنجاح', style: TextStyle(fontFamily: 'Cairo')),
+              SnackBar(
+                content: Text('settings_screen.clear_cache_success'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -121,9 +126,9 @@ class SettingsScreen extends StatelessWidget {
           const Divider(height: 30, indent: 20, endIndent: 20),
 
           // 4. أخرى
-          _buildSectionHeader('أخرى', primaryGreen),
+          _buildSectionHeader('settings_screen.other'.tr(), primaryGreen),
           _buildListTile(
-            Icons.info_outline, 'حول التطبيق', 'الإصدار 1.0.0', () {},
+            Icons.info_outline, 'settings_screen.about_app'.tr(), 'settings_screen.version'.tr(args: ['1.0.0']), () {},
             iconColor: isDarkMode ? Colors.white : Colors.black87,
             textColor: isDarkMode ? Colors.white : Colors.black87,
           ),
@@ -153,17 +158,15 @@ class SettingsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) {
-        // 👇 استخدمنا StatefulBuilder لكي نتمكن من تحديث نافذة الحوار من الداخل
         return StatefulBuilder(
           builder: (context, setState) {
-            // نقرأ اللغة الحالية داخل الـ builder لكي تتحدث مع كل تغيير
             final currentLang = context.locale.languageCode;
 
             return AlertDialog(
               backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               title: Text(
-                'settings_screen.choose_language'.tr(), // 👈 استخدام الترجمة للعنوان
+                'settings_screen.choose_language'.tr(),
                 style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87, fontWeight: FontWeight.bold, fontSize: 18, fontFamily: 'Cairo'),
               ),
               content: Column(
@@ -175,12 +178,10 @@ class SettingsScreen extends StatelessWidget {
                     activeColor: primaryGreen,
                     onChanged: (String? value) async {
                       if (value != null) {
-                        // 1. نغير اللغة في التطبيق
                         await context.setLocale(const Locale('ar'));
-                        // 2. نحدث نافذة الحوار ليتغير اختيار الراديو
                         setState(() {});
                       }
-                      Navigator.pop(dialogContext); // إغلاق النافذة
+                      Navigator.pop(dialogContext);
                     },
                     title: Text('settings_screen.arabic'.tr(), style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87, fontFamily: 'Cairo')),
                   ),
