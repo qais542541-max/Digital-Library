@@ -8,7 +8,15 @@ class ResourceItemCard extends StatelessWidget {
   final IconData icon;
   final UserRole role;
   final VoidCallback onTap;
-  final VoidCallback onDownload;
+
+  final VoidCallback? onDownload;
+  final IconData? actionIcon;
+
+  // 👇 1. تعميم الشارة لتستخدم للرفوف أو لنوع المادة (نظري/عملي)
+  final String? badgeText;
+  final Color? badgeColor;
+  final IconData? badgeIcon;
+
   final Function(String)? onTeacherAction;
 
   const ResourceItemCard({
@@ -18,7 +26,11 @@ class ResourceItemCard extends StatelessWidget {
     required this.icon,
     required this.role,
     required this.onTap,
-    required this.onDownload,
+    this.onDownload,
+    this.actionIcon,
+    this.badgeText,  // استقبال نص الشارة
+    this.badgeColor, // استقبال لون الشارة
+    this.badgeIcon,  // استقبال أيقونة الشارة
     this.onTeacherAction,
   });
 
@@ -26,6 +38,9 @@ class ResourceItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     const Color primaryGreen = Color(0xFF2E7D32);
+
+    // اللون الافتراضي للشارة إذا لم يتم تمرير لون
+    final Color effectiveBadgeColor = badgeColor ?? const Color(0xFFE65100);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -55,21 +70,21 @@ class ResourceItemCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                // 1. أيقونة الملف (البداية: ستظهر يميناً في العربية ويساراً في الإنجليزية)
+                // أيقونة الملف الرئيسية
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: primaryGreen,
+                    color: badgeText != null ? effectiveBadgeColor : primaryGreen,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: Colors.white, size: 24),
                 ),
                 const SizedBox(width: 15),
 
-                // 2. اسم الملف والتفاصيل (المنتصف)
+                // اسم الملف والتفاصيل
                 Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // start يتكيف تلقائياً مع لغة التطبيق
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         title,
@@ -88,25 +103,53 @@ class ResourceItemCard extends StatelessWidget {
                           color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade500,
                         ),
                       ),
+
+                      // 👇 2. الشارة الديناميكية (للرفوف أو نظري/عملي)
+                      if (badgeText != null) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isDarkMode ? effectiveBadgeColor.withOpacity(0.15) : effectiveBadgeColor.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: effectiveBadgeColor.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(badgeIcon ?? Icons.info_outline, color: effectiveBadgeColor, size: 14),
+                              const SizedBox(width: 6),
+                              Text(
+                                badgeText!,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode ? Colors.white : effectiveBadgeColor,
+                                  fontFamily: 'Cairo',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
 
                 const SizedBox(width: 12),
 
-                // 3. زر التنزيل والخيارات (النهاية: ستظهر يساراً في العربية ويميناً في الإنجليزية)
+                // زر الإجراء (تنزيل/فيديو) والخيارات
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // زر التنزيل باللون الأخضر
-                    IconButton(
-                      icon: const Icon(Icons.file_download_outlined, color: primaryGreen, size: 24),
-                      onPressed: onDownload,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
+                    if (onDownload != null)
+                      IconButton(
+                        icon: Icon(actionIcon ?? Icons.file_download_outlined, color: primaryGreen, size: 24),
+                        onPressed: onDownload,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
 
-                    // خيارات المعلم (تظهر فقط للمعلمين)
                     if (role == UserRole.teacher || role == UserRole.employee) ...[
                       const SizedBox(width: 8),
                       PopupMenuButton<String>(
@@ -121,7 +164,7 @@ class ResourceItemCard extends StatelessWidget {
                               children: [
                                 const Icon(Icons.edit, color: Colors.blue, size: 20),
                                 const SizedBox(width: 8),
-                                Text('resource_item_card.edit'.tr())
+                                Text('تعديل')
                               ],
                             ),
                           ),
@@ -131,7 +174,7 @@ class ResourceItemCard extends StatelessWidget {
                               children: [
                                 const Icon(Icons.delete, color: Colors.red, size: 20),
                                 const SizedBox(width: 8),
-                                Text('resource_item_card.delete'.tr())
+                                Text('حذف')
                               ],
                             ),
                           ),
