@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 // 👇 استدعاء شاشة الحاوية الرئيسية وملف الـ enum
 import '../../layout/screens/main_screen.dart';
 
@@ -15,19 +16,19 @@ class LoginScreen extends StatelessWidget {
       // تحديد اسم افتراضي للتجربة حسب الدور الذي تم اختياره
       switch (role) {
         case UserRole.student:
-          mockUserName = 'عمار العقبي'; // تم تحديد اسم الطالب
+          mockUserName = 'login_screen.student_name'.tr(); // تم تحديد اسم الطالب
           break;
         case UserRole.teacher:
-          mockUserName = 'د. أحمد الشيباني';
+          mockUserName = 'login_screen.teacher_name'.tr();
           break;
         case UserRole.employee:
-          mockUserName = 'يوسف شمسان';
+          mockUserName = 'login_screen.employee_name'.tr();
           break;
         case UserRole.external:
-          mockUserName = 'محمد أحمد';
+          mockUserName = 'login_screen.external_name'.tr();
           break;
         case UserRole.guest:
-          mockUserName = 'زائر (ضيف)';
+          mockUserName = 'login_screen.guest_name'.tr();
           break;
       }
 
@@ -54,24 +55,24 @@ class LoginScreen extends StatelessWidget {
                 color: Color(0xFF2E7D32),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'المكتبة الرقمية (نسخة التجربة)',
-                style: TextStyle(
+              Text(
+                'login_screen.app_title'.tr(),
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'اختر صلاحية الدخول لمعاينة الواجهات',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+              Text(
+                'login_screen.choose_role'.tr(),
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 40),
 
               // 1. زر الطالب
               _buildRoleButton(
-                title: 'دخول كطالب',
+                title: 'login_screen.login_as_student'.tr(),
                 icon: Icons.school,
                 color: const Color(0xFF2E7D32),
                 onTap: () => loginAs(UserRole.student),
@@ -79,7 +80,7 @@ class LoginScreen extends StatelessWidget {
 
               // 2. زر المعلم
               _buildRoleButton(
-                title: 'دخول كعضو هيئة تدريس',
+                title: 'login_screen.login_as_teacher'.tr(),
                 icon: Icons.workspace_premium,
                 color: Colors.blue.shade700,
                 onTap: () => loginAs(UserRole.teacher),
@@ -87,7 +88,7 @@ class LoginScreen extends StatelessWidget {
 
               // 3. زر الموظف الإداري
               _buildRoleButton(
-                title: 'دخول كموظف إداري (كنترول)',
+                title: 'login_screen.login_as_employee'.tr(),
                 icon: Icons.admin_panel_settings,
                 color: Colors.orange.shade700,
                 onTap: () => loginAs(UserRole.employee),
@@ -95,7 +96,7 @@ class LoginScreen extends StatelessWidget {
 
               // 4. زر الزائر الخارجي المسجل
               _buildRoleButton(
-                title: 'دخول كباحث خارجي مسجل',
+                title: 'login_screen.login_as_external'.tr(),
                 icon: Icons.person,
                 color: Colors.teal,
                 onTap: () => loginAs(UserRole.external),
@@ -107,9 +108,9 @@ class LoginScreen extends StatelessWidget {
               TextButton.icon(
                 onPressed: () => loginAs(UserRole.guest),
                 icon: const Icon(Icons.explore, color: Colors.grey),
-                label: const Text(
-                  'تصفح التطبيق كضيف (بدون حساب)',
-                  style: TextStyle(fontSize: 16, color: Colors.grey, decoration: TextDecoration.underline),
+                label: Text(
+                  'login_screen.browse_as_guest'.tr(),
+                  style: const TextStyle(fontSize: 16, color: Colors.grey, decoration: TextDecoration.underline),
                 ),
               ),
             ],

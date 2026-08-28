@@ -222,7 +222,7 @@ packages:
     source: sdk
     version: "0.0.0"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
@@ -610,6 +610,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "33.2.15"
+  telegram_nav_bar:
+    dependency: "direct main"
+    description:
+      name: telegram_nav_bar
+      sha256: df8de25ea2dfda21438a14b717cce9b6fac0ab8b9b08e3851e40a7cb8595428a
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1"
   term_glyph:
     dependency: transitive
     description:

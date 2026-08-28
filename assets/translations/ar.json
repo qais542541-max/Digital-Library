@@ -179,19 +179,22 @@
     "algorithms_lecture_subtitle": "مادة: هياكل البيانات"
   },
 
+
   "general_main_screen": {
     "title": "الرئيسية",
     "welcome_msg": "مرحباً، {}! 👋",
     "role": "الصفة: {}",
     "learn_today": "ماذا تريد أن تتعلم اليوم؟",
     "search_hint": "ابحث عن ملازم، مشاريع، محاضرات...",
-    "lectures": "المحاضرات",
     "projects": "المشاريع",
-    "books": "الكتب",
-    "news": "الإعلانات",
+    "website": "الموقع الإلكتروني",
+    "my_loans": "إعاراتي",
+    "teachers_directory": "دليل المعلمين",
     "recently_added": "أحدث الإضافات للمكتبة",
     "advanced_programming": "ملزمة برمجة متقدمة",
     "doctor_name": "د. أحمد محمد",
+    "featured_additions": "إضافات مميزة",
+    "featured_item": "عنصر مميز",
     "college_news": "أخبار وإعلانات الكلية",
     "defense_title": "موعد مناقشة مشاريع التخرج",
     "defense_desc": "تم تحديد موعد مناقشة مشاريع التخرج للدفعة الحالية...",
@@ -200,11 +203,9 @@
     "call": "اتصال",
     "location": "الموقع",
     "email": "مراسلة",
-    "copyright": "© 2026 المكتبة الرقمية - كلية المجتمع صنعاء",
-    "calling": "جاري الاتصال...",
-    "opening_map": "جاري فتح الخريطة...",
-    "opening_email": "جاري فتح الإيميل..."
+    "copyright": "© 2026 المكتبة الرقمية - كلية المجتمع صنعاء"
   },
+
 
   "main_screen": {
     "student": "طالب",
@@ -312,7 +313,23 @@
     "about_app": "حول التطبيق",
     "version": "الإصدار {}",
     "choose_language": "اختر لغة التطبيق"
+  },
+
+  "login_screen": {
+    "student_name": "عمار العقبي",
+    "teacher_name": "د. أحمد الشيباني",
+    "employee_name": "يوسف شمسان",
+    "external_name": "محمد أحمد",
+    "guest_name": "زائر (ضيف)",
+    "app_title": "المكتبة الرقمية (نسخة التجربة)",
+    "choose_role": "اختر صلاحية الدخول لمعاينة الواجهات",
+    "login_as_student": "دخول كطالب",
+    "login_as_teacher": "دخول كعضو هيئة تدريس",
+    "login_as_employee": "دخول كموظف إداري (كنترول)",
+    "login_as_external": "دخول كباحث خارجي مسجل",
+    "browse_as_guest": "تصفح التطبيق كضيف (بدون حساب)"
   }
+
 
 
 }

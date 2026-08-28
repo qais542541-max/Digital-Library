@@ -181,19 +181,22 @@
     "algorithms_lecture_subtitle": "Subject: Data Structures"
   },
 
+
   "general_main_screen": {
     "title": "Home",
     "welcome_msg": "Welcome, {}! 👋",
     "role": "Role: {}",
     "learn_today": "What do you want to learn today?",
     "search_hint": "Search for books, projects, lectures...",
-    "lectures": "Lectures",
     "projects": "Projects",
-    "books": "Books",
-    "news": "News",
+    "website": "College Website",
+    "my_loans": "My Loans",
+    "teachers_directory": "Teachers Directory",
     "recently_added": "Recently Added to Library",
     "advanced_programming": "Advanced Programming Handout",
     "doctor_name": "Dr. Ahmed Mohammed",
+    "featured_additions": "Featured Additions",
+    "featured_item": "Featured Item",
     "college_news": "College News & Announcements",
     "defense_title": "Graduation Projects Defense Date",
     "defense_desc": "The defense date for the current batch's graduation projects has been set...",
@@ -202,11 +205,9 @@
     "call": "Call",
     "location": "Location",
     "email": "Email",
-    "copyright": "© 2026 Digital Library - Sana'a Community College",
-    "calling": "Calling...",
-    "opening_map": "Opening map...",
-    "opening_email": "Opening email..."
+    "copyright": "© 2026 Digital Library - Sana'a Community College"
   },
+
 
   "main_screen": {
     "student": "Student",
@@ -312,6 +313,22 @@
     "about_app": "About App",
     "version": "Version {}",
     "choose_language": "Choose App Language"
+  },
+
+  "login_screen": {
+    "student_name": "عمار العقبي",
+    "teacher_name": "د. أحمد الشيباني",
+    "employee_name": "يوسف شمسان",
+    "external_name": "محمد أحمد",
+    "guest_name": "زائر (ضيف)",
+    "app_title": "المكتبة الرقمية (نسخة التجربة)",
+    "choose_role": "اختر صلاحية الدخول لمعاينة الواجهات",
+    "login_as_student": "دخول كطالب",
+    "login_as_teacher": "دخول كعضو هيئة تدريس",
+    "login_as_employee": "دخول كموظف إداري (كنترول)",
+    "login_as_external": "دخول كباحث خارجي مسجل",
+    "browse_as_guest": "تصفح التطبيق كضيف (بدون حساب)"
   }
+
 
 }
