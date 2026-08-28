@@ -126,14 +126,8 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
         onPressed: () {
           final activeIndex = _tabController.index;
 
-          UploadRestriction currentRestriction;
-          if (activeIndex == 0) {
-            currentRestriction = UploadRestriction.pdfOnly; // الملازم
-          } else if (activeIndex == 1) {
-            currentRestriction = UploadRestriction.youtubeLink; // المحاضرات
-          } else {
-            currentRestriction = UploadRestriction.pdfAndImages; // التكاليف والنماذج
-          }
+          // 👇 تحديث القيود: كل الأقسام تقبل صوراً وملفات، والمحاضرات تقبل روابط وفيديوهات
+          UploadRestriction currentRestriction = UploadRestriction.mixedContent;
 
           showModalBottomSheet(
             context: context,
@@ -142,6 +136,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
             builder: (context) => SmartUploadBottomSheet(
               categoryName: subjectCategories[activeIndex]['title'].toString().tr(),
               restriction: currentRestriction,
+              isCourseMaterial: true,
             ),
           );
         },
@@ -154,12 +149,21 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
   }
 
   Widget _buildFlatCategoryContent(int categoryId, String categoryName, IconData categoryIcon, bool isDarkMode, Color primaryGreen) {
+    final bool isLectureTab = categoryId == 2;
+
+    // محاكاة بيانات تدمج بين العملي والنظري
     final List<Map<String, dynamic>> mockResources = List.generate(
         5,
-            (index) => {
-          'title': 'subject_details_screen.resource_item_title'.tr(args: [categoryName, (index + 1).toString()]),
-          'author': 'subject_details_screen.mock_author'.tr(),
-          'icon': categoryIcon,
+            (index) {
+          // لمحاكاة التنوع: العنصر الزوجي عملي (فيديو)، والفردي نظري (ملف/صورة)
+          bool isPractical = isLectureTab && index % 2 == 0;
+
+          return {
+            'title': 'محتوى ${index + 1} - $categoryName',
+            'author': 'د. أحمد الناشري',
+            'is_practical': isPractical,
+            'icon': isPractical ? Icons.play_circle_fill : (categoryId == 4 ? Icons.image : Icons.picture_as_pdf),
+          };
         }
     );
 
@@ -168,34 +172,40 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
       itemCount: mockResources.length,
       itemBuilder: (context, index) {
         final item = mockResources[index];
+        final isPractical = item['is_practical'] as bool;
+
         return ResourceItemCard(
           title: item['title'],
           subtitle: item['author'],
           icon: item['icon'],
           role: widget.role,
-          onTap: () => print('فتح المورد للقراءة: ${item['title']}'),
-          onDownload: () => print('بدء التنزيل: ${item['title']}'),
+
+          // 👇 1. إضافة الشارة الديناميكية لتمييز النظري عن العملي
+          badgeText: isLectureTab ? (isPractical ? 'تطبيق عملي (فيديو)' : 'محتوى نظري (ملف)') : null,
+          badgeColor: isLectureTab ? (isPractical ? Colors.red.shade600 : Colors.blue.shade700) : null,
+          badgeIcon: isLectureTab ? (isPractical ? Icons.videocam : Icons.description) : null,
+
+          onTap: () {
+            if (isPractical) {
+              print('تشغيل الفيديو: ${item['title']}');
+            } else {
+              print('فتح المورد للقراءة: ${item['title']}');
+            }
+          },
+          // 👇 2. تغيير الزر: تشغيل للعملي، وتنزيل للنظري
+          actionIcon: isPractical ? Icons.play_arrow_rounded : Icons.file_download_outlined,
+          onDownload: isPractical
+              ? () => print('تشغيل الفيديو مباشرة')
+              : () => print('بدء تنزيل الملف'),
+
           onTeacherAction: (action) {
-            if (action == 'edit') {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => SmartUploadBottomSheet(
-                  categoryName: categoryName,
-                  restriction: categoryId == 1 ? UploadRestriction.pdfOnly : (categoryId == 2 ? UploadRestriction.youtubeLink : UploadRestriction.pdfAndImages),
-                  initialData: {
-                    'title': item['title'],
-                    'fileName': 'subject_details_screen.previous_file_name'.tr(),
-                  },
-                ),
-              );
-            } else if (action == 'delete') {
+            if (action == 'delete') {
               _showDeleteConfirmation(item['title']);
             }
           },
         );
       },
     );
+
   }
 }
