@@ -5,6 +5,7 @@ import '../../../core/widgets/custom_drawer.dart';
 import '../../layout/screens/main_screen.dart';
 import '../../../core/widgets/project_details_dialog.dart';
 import '../../../core/widgets/smart_upload_bottom_sheet.dart';
+import '../../../core/widgets/advanced_search_bottom_sheet.dart';
 
 class BooksListScreen extends StatefulWidget {
   final String categoryName;
@@ -95,28 +96,61 @@ class _BooksListScreenState extends State<BooksListScreen> {
       body: Column(
         children: [
           // شريط البحث
+          // شريط البحث والفلترة المتقدمة
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-            child: Container(
-              height: 45,
-              decoration: BoxDecoration(
-                color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: isDarkMode ? Colors.transparent : Colors.grey.shade300),
-              ),
-              child: TextField(
-                style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87, fontSize: 14, fontFamily: 'Cairo'),
-                decoration: InputDecoration(
-                  hintText: 'books_list_screen.search_hint'.tr(args: [widget.categoryName]),
-                  hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontFamily: 'Cairo'),
-                  prefixIcon: const Icon(Icons.search, color: primaryGreen, size: 20),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              children: [
+                // 👇 زر البحث المتقدم
+                Container(
+                  height: 45,
+                  width: 45,
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: isDarkMode ? Colors.transparent : Colors.grey.shade300),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.tune, color: primaryGreen, size: 20),
+                    onPressed: () {
+                      final isPhysicalLibrary = !widget.isPublicLibrary && !isProjectsCategory;
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => AdvancedSearchBottomSheet(isPhysicalLibrary: isPhysicalLibrary),
+                      );
+                    },
+                  ),
                 ),
-              ),
+                const SizedBox(width: 10),
+
+                // شريط البحث النصي
+                Expanded(
+                  child: Container(
+                    height: 45,
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: isDarkMode ? Colors.transparent : Colors.grey.shade300),
+                    ),
+                    child: TextField(
+                      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87, fontSize: 14, fontFamily: 'Cairo'),
+                      decoration: InputDecoration(
+                        hintText: 'books_list_screen.search_hint'.tr(args: [widget.categoryName]),
+                        hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontFamily: 'Cairo'),
+                        prefixIcon: const Icon(Icons.search, color: primaryGreen, size: 20),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
+          // قائمة المحتوى
           // قائمة المحتوى
           Expanded(
             child: ListView.builder(
@@ -125,15 +159,18 @@ class _BooksListScreenState extends State<BooksListScreen> {
               itemBuilder: (context, index) {
                 final item = displayList[index];
 
+                // 👇 تحديد هل هذه مكتبة ورقية أم رقمية (بناءً على المتغير المرر من الشاشة السابقة)
+                final isPhysicalLibrary = !widget.isPublicLibrary && !isProjectsCategory;
+
                 return ResourceItemCard(
                   title: item['title'],
-                  subtitle: isProjectsCategory 
-                      ? 'books_list_screen.supervised_by'.tr(args: [item['supervisor']]) 
-                      : item['author'],
-                  icon: isProjectsCategory ? Icons.architecture : item['icon'],
+                  // 👇 إذا كانت ورقية نظهر الرف، وإذا رقمية نظهر المؤلف
+                  subtitle: isProjectsCategory
+                      ? 'books_list_screen.supervised_by'.tr(args: [item['supervisor'] ?? ''])
+                      : (isPhysicalLibrary ? 'الموقع: الرف A1 - A4' : item['author']), // يمكن ربط الرف بـ shelf_location لاحقاً
 
-                  // 👇 إخفاء الثلاث نقاط تماماً عن الجميع داخل المكتبة بتمرير UserRole.student
-                  role: UserRole.student,
+                  icon: isProjectsCategory ? Icons.architecture : item['icon'],
+                  role: UserRole.student, // إخفاء الثلاث نقاط
 
                   onTap: () {
                     if (isProjectsCategory) {
@@ -141,11 +178,17 @@ class _BooksListScreenState extends State<BooksListScreen> {
                         context: context,
                         builder: (context) => ProjectDetailsDialog(project: item),
                       );
+                    } else if (isPhysicalLibrary) {
+                      // إظهار نافذة تفاصيل الكتاب الورقي ومكانه
+                      print("إظهار بيانات الكتاب الورقي");
                     } else {
                       print('books_list_screen.open_resource_msg'.tr(args: [item['title']]));
                     }
                   },
-                  onDownload: () => print('books_list_screen.downloading_msg'.tr(args: [item['title']])),
+                  // 👇 إلغاء زر التنزيل (إرسال null) إذا كانت المكتبة ورقية أو مشاريع
+                  onDownload: (isPhysicalLibrary || isProjectsCategory)
+                      ? null
+                      : () => print('books_list_screen.downloading_msg'.tr(args: [item['title']])),
                 );
               },
             ),
