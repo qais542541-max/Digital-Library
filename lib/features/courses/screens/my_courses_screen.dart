@@ -72,6 +72,7 @@ class MyCoursesScreen extends StatelessWidget {
       length: 2,
       initialIndex: settings.academicTermIndex,
       child: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             Padding(

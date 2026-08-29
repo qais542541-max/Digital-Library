@@ -26,6 +26,7 @@ class GeneralMainScreen extends StatelessWidget {
       backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.grey.shade50,
 
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             // الترويسة العلوية الموحدة

@@ -4,9 +4,12 @@ import 'package:provider/provider.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/widgets/unified_item_card.dart';
 import '../../../core/widgets/notifications_screen.dart';
-import '../../../core/widgets/advanced_search_bottom_sheet.dart'; // 👈 استدعاء نافذة البحث المتقدم
-import '../../layout/screens/main_screen.dart';
-import 'books_list_screen.dart';
+import '../../../core/widgets/advanced_search_bottom_sheet.dart';
+import 'package:digital_library/features/layout/screens/main_screen.dart';
+import 'package:digital_library/features/library/screens/books_list_screen.dart';
+
+// 👇 تأكد من استدعاء شاشة تسجيل الدخول هنا (قم بتعديل المسار حسب مشروعك)
+import '../../login//screens/login_screen.dart';
 
 class GeneralLibraryScreen extends StatefulWidget {
   final UserRole role;
@@ -17,7 +20,6 @@ class GeneralLibraryScreen extends StatefulWidget {
   State<GeneralLibraryScreen> createState() => _GeneralLibraryScreenState();
 }
 
-// 👇 تحويلها لـ Stateful واستخدام التبويبات
 class _GeneralLibraryScreenState extends State<GeneralLibraryScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -45,6 +47,16 @@ class _GeneralLibraryScreenState extends State<GeneralLibraryScreen> with Single
         'icon': Icons.account_tree,
         'subtitle': 'general_library_screen.graduation_projects_subtitle'.tr()
       },
+      {
+        'title': 'الكتب المنهجية والمراجع',
+        'icon': Icons.library_books,
+        'subtitle': 'مقررات جميع التخصصات الأكاديمية'
+      },
+      {
+        'title': 'رسائل وأبحاث علمية',
+        'icon': Icons.school,
+        'subtitle': 'أبحاث التخرج والدراسات العليا'
+      },
     ];
 
     final List<Map<String, dynamic>> publicLibraryCategories = [
@@ -56,6 +68,7 @@ class _GeneralLibraryScreenState extends State<GeneralLibraryScreen> with Single
     ];
 
     return SafeArea(
+      bottom: false,
       child: Column(
         children: [
           Padding(
@@ -94,9 +107,7 @@ class _GeneralLibraryScreenState extends State<GeneralLibraryScreen> with Single
                   child: IconButton(
                     icon: const Icon(Icons.tune, color: primaryGreen, size: 20),
                     onPressed: () {
-                      // التبويب الأول (index 0) هو المكتبة الورقية
                       final bool isPhysicalTabActive = _tabController.index == 0;
-
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -136,7 +147,7 @@ class _GeneralLibraryScreenState extends State<GeneralLibraryScreen> with Single
           Container(
             color: Colors.transparent,
             child: TabBar(
-              controller: _tabController, // 👈 ربط المتحكم
+              controller: _tabController,
               dividerColor: Colors.transparent,
               labelColor: primaryGreen,
               unselectedLabelColor: Colors.grey,
@@ -150,9 +161,14 @@ class _GeneralLibraryScreenState extends State<GeneralLibraryScreen> with Single
 
           Expanded(
             child: TabBarView(
-              controller: _tabController, // 👈 ربط المتحكم
+              controller: _tabController,
               children: [
-                _buildLibraryGrid(context, collegeLibraryCategories, false),
+                // التبويب الأول: المكتبة الورقية (مغلق للضيف)
+                widget.role == UserRole.guest
+                    ? _buildLoginRequiredState(isDarkMode, primaryGreen, context) // 👈 تم تمرير context هنا للتنقل
+                    : _buildLibraryGrid(context, collegeLibraryCategories, false),
+
+                // التبويب الثاني: المكتبة الرقمية (متاح للجميع)
                 _buildLibraryGrid(context, publicLibraryCategories, true),
               ],
             ),
@@ -160,11 +176,55 @@ class _GeneralLibraryScreenState extends State<GeneralLibraryScreen> with Single
         ],
       ),
     );
+  } // 👈 هنا تنتهي دالة build الأساسية
+
+  // 👇 الدوال المساعدة توضع هنا، خارج دالة build
+
+  Widget _buildLoginRequiredState(bool isDarkMode, Color primaryGreen, BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(30.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.lock_person_outlined, size: 80, color: Colors.grey.shade400),
+            const SizedBox(height: 20),
+            Text(
+              'محتوى مقفل',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white : Colors.black87, fontFamily: 'Cairo'),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'المكتبة الورقية متاحة فقط للطلاب والأساتذة المسجلين. يرجى تسجيل الدخول للاستعارة وحجز الكتب.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade600, fontFamily: 'Cairo'),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton.icon(
+              onPressed: () {
+                // 👇 توجيه الضيف إلى شاشة تسجيل الدخول
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
+              icon: const Icon(Icons.login, color: Colors.white),
+              label: const Text('تسجيل الدخول / تفعيل حساب', style: TextStyle(color: Colors.white, fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryGreen,
+                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildLibraryGrid(BuildContext context, List<Map<String, dynamic>> categories, bool isPublic) {
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 120), // 👈 حشوة سفلية ليظهر التلاشي بشكل سليم
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 0.85,
       ),

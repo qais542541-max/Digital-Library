@@ -126,8 +126,14 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
         onPressed: () {
           final activeIndex = _tabController.index;
 
-          // 👇 تحديث القيود: كل الأقسام تقبل صوراً وملفات، والمحاضرات تقبل روابط وفيديوهات
-          UploadRestriction currentRestriction = UploadRestriction.mixedContent;
+          UploadRestriction currentRestriction;
+          if (activeIndex == 1) {
+            // المحاضرات تقبل روابط، صور، وملفات (محتوى مختلط)
+            currentRestriction = UploadRestriction.mixedContent;
+          } else {
+            // الملازم والنماذج تقبل ملفات وصور فقط
+            currentRestriction = UploadRestriction.pdfAndImages;
+          }
 
           showModalBottomSheet(
             context: context,
@@ -142,27 +148,26 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
         },
         backgroundColor: primaryGreen,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: Text('subject_details_screen.upload_resource'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: Text('subject_details_screen.upload_resource'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
       )
           : null,
     );
   }
 
   Widget _buildFlatCategoryContent(int categoryId, String categoryName, IconData categoryIcon, bool isDarkMode, Color primaryGreen) {
-    final bool isLectureTab = categoryId == 2;
-
-    // محاكاة بيانات تدمج بين العملي والنظري
+    // محاكاة بيانات تدمج بين العملي والنظري في *جميع التبويبات*
     final List<Map<String, dynamic>> mockResources = List.generate(
         5,
             (index) {
-          // لمحاكاة التنوع: العنصر الزوجي عملي (فيديو)، والفردي نظري (ملف/صورة)
-          bool isPractical = isLectureTab && index % 2 == 0;
+          // محاكاة: العنصر الزوجي عملي، والفردي نظري (مُطبقة على كل الأقسام الآن)
+          bool isPractical = index % 2 == 0;
 
           return {
             'title': 'محتوى ${index + 1} - $categoryName',
             'author': 'د. أحمد الناشري',
             'is_practical': isPractical,
-            'icon': isPractical ? Icons.play_circle_fill : (categoryId == 4 ? Icons.image : Icons.picture_as_pdf),
+            // الأيقونة الرئيسية: في تبويب المحاضرات فقط نغيرها لفيديو إذا كانت عملي، أما البقية فتحتفظ بأيقونتها الأساسية
+            'icon': categoryId == 2 && isPractical ? Icons.ondemand_video_rounded : categoryIcon,
           };
         }
     );
@@ -180,23 +185,21 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
           icon: item['icon'],
           role: widget.role,
 
-          // 👇 1. إضافة الشارة الديناميكية لتمييز النظري عن العملي
-          badgeText: isLectureTab ? (isPractical ? 'تطبيق عملي (فيديو)' : 'محتوى نظري (ملف)') : null,
-          badgeColor: isLectureTab ? (isPractical ? Colors.red.shade600 : Colors.blue.shade700) : null,
-          badgeIcon: isLectureTab ? (isPractical ? Icons.videocam : Icons.description) : null,
+          // 👇 نمرر متغير isPractical للبطاقة لترسم الشارة (Tag) في كل التبويبات
+          isPractical: isPractical,
 
           onTap: () {
             if (isPractical) {
-              print('تشغيل الفيديو: ${item['title']}');
+              print('تشغيل / فتح المورد العملي: ${item['title']}');
             } else {
-              print('فتح المورد للقراءة: ${item['title']}');
+              print('فتح المورد النظري للقراءة: ${item['title']}');
             }
           },
-          // 👇 2. تغيير الزر: تشغيل للعملي، وتنزيل للنظري
+          // زر الإجراء: تشغيل للعملي، وتنزيل للنظري
           actionIcon: isPractical ? Icons.play_arrow_rounded : Icons.file_download_outlined,
           onDownload: isPractical
-              ? () => print('تشغيل الفيديو مباشرة')
-              : () => print('بدء تنزيل الملف'),
+              ? () => print('فتح المحتوى العملي مباشرة')
+              : () => print('بدء تنزيل الملف النظري'),
 
           onTeacherAction: (action) {
             if (action == 'delete') {
@@ -206,6 +209,5 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
         );
       },
     );
-
   }
 }

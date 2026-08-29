@@ -12,10 +12,9 @@ class ResourceItemCard extends StatelessWidget {
   final VoidCallback? onDownload;
   final IconData? actionIcon;
 
-  // 👇 1. تعميم الشارة لتستخدم للرفوف أو لنوع المادة (نظري/عملي)
-  final String? badgeText;
-  final Color? badgeColor;
-  final IconData? badgeIcon;
+  final String? shelfLocation;
+  final bool? isBorrowed;
+  final bool? isPractical; // 👈 متغير نوع المادة (عملي/نظري)
 
   final Function(String)? onTeacherAction;
 
@@ -28,9 +27,9 @@ class ResourceItemCard extends StatelessWidget {
     required this.onTap,
     this.onDownload,
     this.actionIcon,
-    this.badgeText,  // استقبال نص الشارة
-    this.badgeColor, // استقبال لون الشارة
-    this.badgeIcon,  // استقبال أيقونة الشارة
+    this.shelfLocation,
+    this.isBorrowed,
+    this.isPractical,
     this.onTeacherAction,
   });
 
@@ -38,9 +37,6 @@ class ResourceItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     const Color primaryGreen = Color(0xFF2E7D32);
-
-    // اللون الافتراضي للشارة إذا لم يتم تمرير لون
-    final Color effectiveBadgeColor = badgeColor ?? const Color(0xFFE65100);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -70,22 +66,23 @@ class ResourceItemCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                // أيقونة الملف الرئيسية
+                // 1. أيقونة الملف الرئيسية
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: badgeText != null ? effectiveBadgeColor : primaryGreen,
+                    color: primaryGreen,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: Colors.white, size: 24),
                 ),
                 const SizedBox(width: 15),
 
-                // اسم الملف والتفاصيل
+                // 2. اسم الملف، الأستاذ، وشارة النظري/عملي
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // العنوان الأساسي
                       Text(
                         title,
                         style: TextStyle(
@@ -96,40 +93,98 @@ class ResourceItemCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade500,
-                        ),
-                      ),
 
-                      // 👇 2. الشارة الديناميكية (للرفوف أو نظري/عملي)
-                      if (badgeText != null) ...[
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: isDarkMode ? effectiveBadgeColor.withOpacity(0.15) : effectiveBadgeColor.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: effectiveBadgeColor.withOpacity(0.3)),
+                      // 👇 سطر الأستاذ + شارة النظري/عملي متباعدين
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              subtitle,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                                fontFamily: 'Cairo',
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis, // لضمان عدم تداخل الأسماء الطويلة مع الشارة
+                            ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(badgeIcon ?? Icons.info_outline, color: effectiveBadgeColor, size: 14),
-                              const SizedBox(width: 6),
-                              Text(
-                                badgeText!,
+
+                          // الشارة (Tag) بدون أيقونات ومحاذية للطرف
+                          if (isPractical != null)
+                            Container(
+                              margin: const EdgeInsetsDirectional.only(start: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: isPractical!
+                                    ? Colors.blue.withOpacity(isDarkMode ? 0.15 : 0.08)
+                                    : primaryGreen.withOpacity(isDarkMode ? 0.15 : 0.08),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: isPractical! ? Colors.blue.withOpacity(0.3) : primaryGreen.withOpacity(0.3),
+                                ),
+                              ),
+                              child: Text(
+                                isPractical! ? 'عملي' : 'نظري',
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 10, // خط أصغر لتبدو كشارة أنيقة
                                   fontWeight: FontWeight.bold,
-                                  color: isDarkMode ? Colors.white : effectiveBadgeColor,
+                                  color: isPractical!
+                                      ? Colors.blue
+                                      : (isDarkMode ? Colors.green.shade300 : primaryGreen),
                                   fontFamily: 'Cairo',
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                        ],
+                      ),
+
+                      // الشارات القديمة للرفوف وحالة الإعارة (تم الإبقاء عليها بالأسفل إذا احتجتها مستقبلاً)
+                      if (shelfLocation != null || isBorrowed != null) ...[
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: [
+                            if (shelfLocation != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode ? primaryGreen.withOpacity(0.15) : primaryGreen.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: primaryGreen.withOpacity(0.3)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.shelves, color: primaryGreen, size: 14),
+                                    const SizedBox(width: 4),
+                                    Text('الرف: $shelfLocation', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.green.shade300 : primaryGreen, fontFamily: 'Cairo')),
+                                  ],
+                                ),
+                              ),
+
+                            if (isBorrowed != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: isBorrowed! ? Colors.red.withOpacity(isDarkMode ? 0.15 : 0.08) : primaryGreen.withOpacity(isDarkMode ? 0.15 : 0.08),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: isBorrowed! ? Colors.red.withOpacity(0.3) : primaryGreen.withOpacity(0.3)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(isBorrowed! ? Icons.do_not_disturb_alt : Icons.check_circle_outline, color: isBorrowed! ? Colors.red : primaryGreen, size: 14),
+                                    const SizedBox(width: 4),
+                                    Text(isBorrowed! ? 'معار' : 'متاح', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isBorrowed! ? Colors.red : (isDarkMode ? Colors.green.shade300 : primaryGreen), fontFamily: 'Cairo')),
+                                  ],
+                                ),
+                              ),
+                          ],
                         ),
                       ],
                     ],
@@ -138,7 +193,7 @@ class ResourceItemCard extends StatelessWidget {
 
                 const SizedBox(width: 12),
 
-                // زر الإجراء (تنزيل/فيديو) والخيارات
+                // 3. أزرار الإجراءات
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -158,26 +213,8 @@ class ResourceItemCard extends StatelessWidget {
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                const Icon(Icons.edit, color: Colors.blue, size: 20),
-                                const SizedBox(width: 8),
-                                Text('تعديل')
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                const Icon(Icons.delete, color: Colors.red, size: 20),
-                                const SizedBox(width: 8),
-                                Text('حذف')
-                              ],
-                            ),
-                          ),
+                          PopupMenuItem(value: 'edit', child: Row(children: [const Icon(Icons.edit, color: Colors.blue, size: 20), const SizedBox(width: 8), Text('resource_item_card.edit'.tr())])),
+                          PopupMenuItem(value: 'delete', child: Row(children: [const Icon(Icons.delete, color: Colors.red, size: 20), const SizedBox(width: 8), Text('resource_item_card.delete'.tr())])),
                         ],
                       ),
                     ],

@@ -130,17 +130,7 @@ class AiAssistantScreen extends StatelessWidget {
   Widget _buildInputField(bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: isDarkMode ? Colors.transparent : Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, -1),
-          ),
-        ],
-      ),
+      // 👇 تم إزالة BoxDecoration الذي كان يسبب المستطيل الأبيض والظل
       child: Row(
         children: [
           Expanded(
@@ -154,7 +144,8 @@ class AiAssistantScreen extends StatelessWidget {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
+                // يمكنك تفتيح لون حقل النص قليلاً في الوضع الفاتح ليكون بارزاً
+                fillColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade200,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
             ),

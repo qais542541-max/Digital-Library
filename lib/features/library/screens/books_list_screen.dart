@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../core/widgets/resource_item_card.dart';
 import '../../../core/widgets/custom_drawer.dart';
-import '../../layout/screens/main_screen.dart';
+import 'package:digital_library/features/layout/screens/main_screen.dart';
 import '../../../core/widgets/project_details_dialog.dart';
 import '../../../core/widgets/smart_upload_bottom_sheet.dart';
 import '../../../core/widgets/advanced_search_bottom_sheet.dart';
@@ -35,17 +35,42 @@ class _BooksListScreenState extends State<BooksListScreen> {
     const Color primaryGreen = Color(0xFF2E7D32);
     final Color scaffoldBackgroundColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
 
-    // بيانات تجريبية
+    // 👇 بيانات تجريبية موسعة تشمل حالة الإعارة للكتب الورقية
     final List<Map<String, dynamic>> mockBooks = [
       {
         'title': 'books_list_screen.intro_to_software_eng'.tr(),
         'author': 'books_list_screen.ian_sommerville'.tr(),
-        'icon': Icons.menu_book
+        'icon': Icons.menu_book,
+        'shelf': 'A1 - قسم البرمجيات',
+        'isBorrowed': false // متاح
       },
       {
         'title': 'books_list_screen.data_structures_algorithms'.tr(),
         'author': 'books_list_screen.robert_lafore'.tr(),
-        'icon': Icons.picture_as_pdf
+        'icon': Icons.menu_book,
+        'shelf': 'A2 - قسم البرمجيات',
+        'isBorrowed': true // معار
+      },
+      {
+        'title': 'تصميم وتحليل النظم',
+        'author': 'جيفري هوفر',
+        'icon': Icons.menu_book,
+        'shelf': 'B1 - نظم المعلومات',
+        'isBorrowed': false // متاح
+      },
+      {
+        'title': 'شبكات الحاسوب والاتصالات',
+        'author': 'أندرو تانينباوم',
+        'icon': Icons.menu_book,
+        'shelf': 'C3 - قسم الشبكات',
+        'isBorrowed': true // معار
+      },
+      {
+        'title': 'أمن المعلومات والتشفير',
+        'author': 'ويليام ستولينجز',
+        'icon': Icons.menu_book,
+        'shelf': 'C4 - قسم الأمن السيبراني',
+        'isBorrowed': false // متاح
       },
     ];
 
@@ -95,13 +120,11 @@ class _BooksListScreenState extends State<BooksListScreen> {
 
       body: Column(
         children: [
-          // شريط البحث
           // شريط البحث والفلترة المتقدمة
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
             child: Row(
               children: [
-                // 👇 زر البحث المتقدم
                 Container(
                   height: 45,
                   width: 45,
@@ -124,8 +147,6 @@ class _BooksListScreenState extends State<BooksListScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-
-                // شريط البحث النصي
                 Expanded(
                   child: Container(
                     height: 45,
@@ -151,26 +172,25 @@ class _BooksListScreenState extends State<BooksListScreen> {
           ),
 
           // قائمة المحتوى
-          // قائمة المحتوى
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.fromLTRB(0, 12, 0, 80),
               itemCount: displayList.length,
               itemBuilder: (context, index) {
                 final item = displayList[index];
-
-                // 👇 تحديد هل هذه مكتبة ورقية أم رقمية (بناءً على المتغير المرر من الشاشة السابقة)
                 final isPhysicalLibrary = !widget.isPublicLibrary && !isProjectsCategory;
 
                 return ResourceItemCard(
                   title: item['title'],
-                  // 👇 إذا كانت ورقية نظهر الرف، وإذا رقمية نظهر المؤلف
                   subtitle: isProjectsCategory
                       ? 'books_list_screen.supervised_by'.tr(args: [item['supervisor'] ?? ''])
-                      : (isPhysicalLibrary ? 'الموقع: الرف A1 - A4' : item['author']), // يمكن ربط الرف بـ shelf_location لاحقاً
-
+                      : (item['author'] ?? 'مؤلف غير معروف'),
                   icon: isProjectsCategory ? Icons.architecture : item['icon'],
-                  role: UserRole.student, // إخفاء الثلاث نقاط
+                  role: UserRole.student,
+
+                  // 👇 تمرير بيانات الرف وحالة الإعارة فقط إذا كانت المكتبة ورقية
+                  shelfLocation: isPhysicalLibrary ? (item['shelf'] ?? 'الرف العام') : null,
+                  isBorrowed: isPhysicalLibrary ? (item['isBorrowed'] ?? false) : null,
 
                   onTap: () {
                     if (isProjectsCategory) {
@@ -179,13 +199,12 @@ class _BooksListScreenState extends State<BooksListScreen> {
                         builder: (context) => ProjectDetailsDialog(project: item),
                       );
                     } else if (isPhysicalLibrary) {
-                      // إظهار نافذة تفاصيل الكتاب الورقي ومكانه
                       print("إظهار بيانات الكتاب الورقي");
                     } else {
                       print('books_list_screen.open_resource_msg'.tr(args: [item['title']]));
                     }
                   },
-                  // 👇 إلغاء زر التنزيل (إرسال null) إذا كانت المكتبة ورقية أو مشاريع
+                  // إخفاء التنزيل للمكتبة الورقية والمشاريع
                   onDownload: (isPhysicalLibrary || isProjectsCategory)
                       ? null
                       : () => print('books_list_screen.downloading_msg'.tr(args: [item['title']])),
@@ -196,7 +215,6 @@ class _BooksListScreenState extends State<BooksListScreen> {
         ],
       ),
 
-      // 👇 ظهور زر الرفع في المكتبة العامة فقط للموظفين والمدرسين والطلاب
       floatingActionButton: widget.isPublicLibrary &&
           (widget.role == UserRole.student ||
               widget.role == UserRole.teacher ||
