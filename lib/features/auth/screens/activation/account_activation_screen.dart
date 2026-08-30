@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../steps/step_role_selection.dart';
 import '../steps/step_credentials.dart';
 import '../steps/step_verification.dart';
+import '../steps/step_external_info.dart'; // استدعاء الشاشة الجديدة للزائر
 
 class AccountActivationScreen extends StatefulWidget {
   const AccountActivationScreen({super.key});
@@ -14,19 +18,254 @@ class AccountActivationScreen extends StatefulWidget {
 class _AccountActivationScreenState extends State<AccountActivationScreen> {
   final PageController _pageController = PageController();
   int _currentStep = 0;
-  final int _totalSteps = 3;
 
-  // البيانات التي سيتم تجميعها من الخطوات
+  // حساب عدد الخطوات ديناميكياً (3 للموظف/الطالب، 4 للزائر)
+  int get _totalSteps => _selectedRole == 'external' ? 4 : 3;
+
   String _selectedRole = 'student';
+
+  // متحكمات البيانات المشتركة
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _otpController = TextEditingController();
 
-  void _nextStep() {
+  // متحكمات بيانات الزائر (مطابقة للموقع)
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _institutionController = TextEditingController();
+  final TextEditingController _jobTitleController = TextEditingController();
+  String? _selectedGender;
+
+  bool _isLoading = false;
+  Map<String, dynamic>? _memberData; // تخزين بيانات العضو المستلمة من السيرفر
+
+  void _showUserDataDialog(Map<String, dynamic> userData) {
+    setState(() => _memberData = userData); // حفظ البيانات للاستخدام لاحقاً
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    const Color primaryGreen = Color(0xFF2E7D32);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+        title: const Text(
+          'تأكيد البيانات',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircleAvatar(
+              radius: 35,
+              backgroundColor: Color(0xFFE8F5E9),
+              child: Icon(Icons.person, size: 40, color: primaryGreen),
+            ),
+            const SizedBox(height: 20),
+            _buildDataRow('الاسم:', userData['name'] ?? 'غير متوفر', isDarkMode),
+            _buildDataRow('الرقم:', userData['member_id'] ?? _idController.text, isDarkMode),
+            _buildDataRow('القسم:', userData['department'] ?? 'العام', isDarkMode),
+            _buildDataRow('النوع:', _selectedRole == 'student' ? 'طالب' : 'مدرس', isDarkMode),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo', color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // إغلاق النافذة
+              _moveToNextStep(); // الانتقال للخطوة التالية
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryGreen,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('متابعة', style: TextStyle(fontFamily: 'Cairo', color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDataRow(String label, String value, bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(fontFamily: 'Cairo', color: Colors.grey.shade600, fontSize: 14)),
+          Text(value, style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white : Colors.black87, fontSize: 14)),
+        ],
+      ),
+    );
+  }
+
+  void _moveToNextStep() {
     if (_currentStep < _totalSteps - 1) {
-      _pageController.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
       setState(() => _currentStep++);
+    }
+  }
+
+  Future<void> _sendVerification() async {
+    setState(() => _isLoading = true);
+    try {
+      String apiUrl = kIsWeb
+          ? 'http://localhost/lib_book2/public/send_verification.php'
+          : 'http://192.168.1.100/lib_book2/public/send_verification.php';
+
+      // تجهيز البيانات بناءً على الدور
+      Map<String, dynamic> payload;
+      if (_selectedRole == 'external') {
+        payload = {
+          "phone": _phoneController.text,
+          "email": _emailController.text,
+          "verification_method": "email",
+          "member_id": 0,
+          "first_name": _fullNameController.text.split(' ').first,
+          "last_name": _fullNameController.text.split(' ').length > 1 ? _fullNameController.text.split(' ').last : "",
+          "full_name": _fullNameController.text,
+          "member_type": _selectedRole,
+          "gender": _selectedGender ?? "male",
+          "member_number": "",
+          "institution": _institutionController.text,
+          "job_title": _jobTitleController.text,
+          "username": _usernameController.text,
+          "password": _passwordController.text,
+        };
+      } else {
+        // للأدوار الأكاديمية (طالب/مدرس) نستخدم البيانات المستلمة سابقاً من check_member
+        payload = {
+          "phone": _memberData?['phone'] ?? "77", // الافتراضي إذا لم يعد من السيرفر
+          "email": _memberData?['email'] ?? "a1^@g.com",
+          "verification_method": "email",
+          "member_id": int.tryParse(_memberData?['id']?.toString() ?? "0") ?? 0,
+          "first_name": _memberData?['name']?.toString().split(' ').first ?? "",
+          "last_name": "",
+          "full_name": _memberData?['name'] ?? "",
+          "member_type": _selectedRole,
+          "gender": _memberData?['gender'] ?? "male",
+          "member_number": _idController.text,
+          "institution": "",
+          "job_title": "",
+          "username": _usernameController.text,
+          "password": _passwordController.text,
+        };
+      }
+
+      var response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Accept': '*/*',
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0',
+        },
+        body: json.encode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        _moveToNextStep(); // الانتقال لخطوة إدخال الـ OTP
+      } else {
+        throw Exception('فشل في إرسال رمز التحقق: ${response.body}');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('خطأ في إرسال الكود: $e', style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.redAccent),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _nextStep() async {
+    // 1. التحقق من الهوية (الخطوة الأولى للأكاديميين)
+    if (_currentStep == 0 && _selectedRole != 'external') {
+      if (_idController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('يرجى إدخال الرقم الأكاديمي/الوظيفي', style: TextStyle(fontFamily: 'Cairo'))),
+        );
+        return;
+      }
+
+      setState(() => _isLoading = true);
+
+      try {
+        // تحديد الرابط بناءً على النظام (ويب أو أندرويد)
+        String apiUrl;
+        if (kIsWeb) {
+          apiUrl = 'http://localhost/lib_book2/public/check_member.php';
+        } else {
+          apiUrl = 'http://192.168.1.100/lib_book2/public/check_member.php';
+        }
+
+        var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+
+        request.headers.addAll({
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0',
+        });
+
+        request.fields['member_id'] = _idController.text.trim();
+        request.fields['member_type'] = _selectedRole;
+
+        var streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> responseData = json.decode(response.body);
+          
+          if (responseData['status'] == 'success' || responseData['data'] != null) {
+            // عرض بيانات المستخدم في نافذة للتأكيد
+            _showUserDataDialog(responseData['data'] ?? responseData);
+          } else {
+            throw Exception('البيانات غير صحيحة');
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('الرقم غير مسجل في النظام. يرجى التأكد من البيانات.', style: TextStyle(fontFamily: 'Cairo')),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('حدث خطأ: $e', style: const TextStyle(fontFamily: 'Cairo')),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      } finally {
+        setState(() => _isLoading = false);
+      }
+      return;
+    }
+
+    // 2. إرسال رمز التحقق (عند المتابعة من خطوة بيانات الدخول)
+    // خطوة بيانات الدخول هي الأخيرة قبل خطوة التحقق (OTP)
+    if (_currentStep == _totalSteps - 2) {
+      if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('يرجى إدخال بيانات الدخول كاملة', style: TextStyle(fontFamily: 'Cairo'))),
+        );
+        return;
+      }
+      await _sendVerification();
+      return;
+    }
+
+    // المنطق الافتراضي لباقي الخطوات أو للزائر
+    if (_currentStep < _totalSteps - 1) {
+      _moveToNextStep();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم تفعيل الحساب بنجاح!', style: TextStyle(fontFamily: 'Cairo'))),
@@ -80,16 +319,43 @@ class _AccountActivationScreenState extends State<AccountActivationScreen> {
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
+                  // الخطوة 1: اختيار الدور
                   StepRoleSelection(
                     selectedRole: _selectedRole,
                     idController: _idController,
-                    onRoleChanged: (role) => setState(() => _selectedRole = role),
+                    onRoleChanged: (role) {
+                      setState(() {
+                        _selectedRole = role;
+                        // إذا رجع المستخدم من خطوة متقدمة وغير دوره، أعده للخطوة الأولى
+                        if (_currentStep > 0) {
+                          _currentStep = 0;
+                          _pageController.jumpToPage(0);
+                        }
+                      });
+                    },
                   ),
+
+                  // الخطوة 2: تختلف حسب الدور
+                  if (_selectedRole == 'external')
+                  // للزائر: إدخال البيانات الشخصية أولاً
+                    StepExternalInfo(
+                      fullNameController: _fullNameController,
+                      emailController: _emailController,
+                      phoneController: _phoneController,
+                      institutionController: _institutionController,
+                      jobTitleController: _jobTitleController,
+                      selectedGender: _selectedGender,
+                      onGenderChanged: (val) => setState(() => _selectedGender = val),
+                    ),
+
+                  // الخطوة 2 أو 3: بيانات الدخول (حسب الدور)
                   StepCredentials(
                     selectedRole: _selectedRole,
                     usernameController: _usernameController,
                     passwordController: _passwordController,
                   ),
+
+                  // الخطوة الأخيرة: التحقق
                   StepVerification(
                     otpController: _otpController,
                   ),
@@ -179,16 +445,26 @@ class _AccountActivationScreenState extends State<AccountActivationScreen> {
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: _nextStep,
+                onPressed: _isLoading ? null : _nextStep,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryGreen,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
+                  disabledBackgroundColor: primaryGreen.withOpacity(0.6),
                 ),
-                child: Text(
-                  _currentStep == _totalSteps - 1 ? 'تأكيد وإنهاء' : 'متابعة',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Cairo'),
-                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Text(
+                        _currentStep == _totalSteps - 1 ? 'تأكيد وإنهاء' : 'متابعة',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Cairo'),
+                      ),
               ),
             ),
           ],

@@ -43,6 +43,7 @@ dependencies:
     sdk: flutter
   image_picker: ^1.2.3
   telegram_nav_bar: ^0.2.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

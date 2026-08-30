@@ -26,6 +26,10 @@ class _StepCredentialsState extends State<StepCredentials> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     const Color primaryGreen = Color(0xFF2E7D32);
 
+    // الحل: فصل الألوان العادية عن الألوان الغامقة
+    final Color roleColor = widget.selectedRole == 'external' ? Colors.blue : primaryGreen;
+    final Color roleColorDark = widget.selectedRole == 'external' ? Colors.blue.shade700 : primaryGreen;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -34,8 +38,6 @@ class _StepCredentialsState extends State<StepCredentials> {
           if (widget.selectedRole != 'external') ...[
             Text('تأكيد الهوية', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white : Colors.black87, fontFamily: 'Cairo')),
             const SizedBox(height: 15),
-
-            // بطاقة الهوية الأنيقة
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -65,19 +67,40 @@ class _StepCredentialsState extends State<StepCredentials> {
               ),
             ),
             const SizedBox(height: 30),
+          ] else ...[
+            Center(
+              child: Column(
+                children: [
+                  Icon(Icons.key, color: roleColor, size: 40),
+                  const SizedBox(height: 10),
+                  // استخدام المتغير الجديد هنا
+                  Text('معلومات تسجيل الدخول', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: roleColorDark, fontFamily: 'Cairo')),
+                  const SizedBox(height: 5),
+                  Text('يرجى إنشاء اسم مستخدم وكلمة مرور لحسابك', style: TextStyle(fontSize: 13, color: Colors.grey.shade600, fontFamily: 'Cairo')),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
           ],
 
           Text('بيانات الدخول', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white : Colors.black87, fontFamily: 'Cairo')),
           const SizedBox(height: 15),
 
-          _buildTextField('اسم مستخدم جديد', Icons.alternate_email, widget.usernameController, false, isDarkMode),
+          _buildTextField('اسم مستخدم جديد', Icons.person, widget.usernameController, false, isDarkMode, roleColor),
           const SizedBox(height: 15),
 
-          _buildTextField('كلمة المرور', Icons.lock_outline, widget.passwordController, _isObscure1, isDarkMode,
+          _buildTextField('كلمة المرور', Icons.lock_outline, widget.passwordController, _isObscure1, isDarkMode, roleColor,
               suffix: IconButton(icon: Icon(_isObscure1 ? Icons.visibility_off : Icons.visibility, color: Colors.grey), onPressed: () => setState(() => _isObscure1 = !_isObscure1))),
+
+          if (widget.selectedRole == 'external')
+            Padding(
+              padding: const EdgeInsets.only(top: 8, right: 10),
+              child: Text('يجب أن تتكون كلمة المرور من 6 خانات وتحتوي على أرقام وحروف', style: TextStyle(color: Colors.grey.shade500, fontSize: 11, fontFamily: 'Cairo')),
+            ),
+
           const SizedBox(height: 15),
 
-          _buildTextField('تأكيد كلمة المرور', Icons.lock_outline, null, _isObscure2, isDarkMode,
+          _buildTextField('تأكيد كلمة المرور', Icons.lock_outline, null, _isObscure2, isDarkMode, roleColor,
               suffix: IconButton(icon: Icon(_isObscure2 ? Icons.visibility_off : Icons.visibility, color: Colors.grey), onPressed: () => setState(() => _isObscure2 = !_isObscure2))),
 
           const SizedBox(height: 20),
@@ -85,23 +108,25 @@ class _StepCredentialsState extends State<StepCredentials> {
             children: [
               Checkbox(
                 value: _agreeTerms,
-                activeColor: primaryGreen,
+                activeColor: roleColor,
                 onChanged: (val) => setState(() => _agreeTerms = val!),
               ),
               Expanded(
                 child: Text.rich(TextSpan(
                   text: 'أوافق على ', style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87, fontFamily: 'Cairo', fontSize: 13),
-                  children: const [TextSpan(text: 'الشروط والأحكام ', style: TextStyle(color: primaryGreen, fontWeight: FontWeight.bold)), TextSpan(text: 'الخاصة بالمكتبة.')],
+                  children: [TextSpan(text: 'الشروط والأحكام ', style: TextStyle(color: roleColor, fontWeight: FontWeight.bold)), const TextSpan(text: 'الخاصة بالمكتبة.')],
                 )),
               )
             ],
-          )
+          ),
+
+          const SizedBox(height: 80),
         ],
       ),
     );
   }
 
-  Widget _buildTextField(String label, IconData icon, TextEditingController? controller, bool obscure, bool isDarkMode, {Widget? suffix}) {
+  Widget _buildTextField(String label, IconData icon, TextEditingController? controller, bool obscure, bool isDarkMode, Color focusColor, {Widget? suffix}) {
     return TextField(
       controller: controller,
       obscureText: obscure,
@@ -114,7 +139,7 @@ class _StepCredentialsState extends State<StepCredentials> {
         fillColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade300)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.grey.shade300)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFF2E7D32), width: 2)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: focusColor, width: 2)),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:digital_library/features/layout/screens/main_screen.dart';
 import '../../../core/widgets/project_details_dialog.dart';
 import '../../../core/widgets/smart_upload_bottom_sheet.dart';
 import '../../../core/widgets/advanced_search_bottom_sheet.dart';
+import 'pdf_viewer_screen.dart';
 
 class BooksListScreen extends StatefulWidget {
   final String categoryName;
@@ -201,7 +202,16 @@ class _BooksListScreenState extends State<BooksListScreen> {
                     } else if (isPhysicalLibrary) {
                       print("إظهار بيانات الكتاب الورقي");
                     } else {
-                      print('books_list_screen.open_resource_msg'.tr(args: [item['title']]));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PdfViewerScreen(
+                            pdfTitle: item['title'] ?? 'بدون عنوان',
+                            // التأكد من جلب الرابط الذي أضفناه في الخطوة الثانية
+                            pdfUrl: item['pdfUrl'] ?? 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+                          ),
+                        ),
+                      );
                     }
                   },
                   // إخفاء التنزيل للمكتبة الورقية والمشاريع
