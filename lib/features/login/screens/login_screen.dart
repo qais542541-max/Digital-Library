@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:digital_library/features/layout/screens/main_screen.dart';
 import 'package:digital_library/features/auth/screens/activation/account_activation_screen.dart';
+import '../../../core/constants/api_constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   void _performLogin() async {
+
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('يرجى إدخال اسم المستخدم وكلمة المرور', style: TextStyle(fontFamily: 'Cairo'))),
@@ -32,9 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      String apiUrl = kIsWeb
-          ? 'http://localhost/lib_book2/api/login.php'
-          : 'http://192.168.1.100/lib_book2/api/login.php';
+      String apiUrl = ApiConstants.login;
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
           'password': _passwordController.text,
           'remember': '1',
         },
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         // فك تشفير الرد

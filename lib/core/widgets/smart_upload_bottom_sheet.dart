@@ -5,21 +5,21 @@ enum UploadRestriction {
   pdfOnly,
   youtubeLink,
   pdfAndImages,
-  mixedContent, // 👈 نوع جديد يدعم النظري والعملي معاً
+  mixedContent, // نوع يدعم النظري والعملي معاً
 }
 
 class SmartUploadBottomSheet extends StatefulWidget {
   final String categoryName;
   final UploadRestriction restriction;
   final Map<String, dynamic>? initialData;
-  final bool isCourseMaterial; // 👈 1. إضافة متغير جديد لمعرفة هل الرفع لمقرر دراسي أم لا
+  final bool isCourseMaterial; // معرفة هل الرفع لمقرر دراسي / محاضرات أم لا
 
   const SmartUploadBottomSheet({
     super.key,
     required this.categoryName,
     required this.restriction,
     this.initialData,
-    this.isCourseMaterial = false, // القيمة الافتراضية مكتبة
+    this.isCourseMaterial = false, // القيمة الافتراضية للمكتبة العامة
   });
 
   @override
@@ -32,10 +32,10 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
   late TextEditingController _descController;
   late TextEditingController _linkController;
 
-
   String? _selectedFileName;
   String? _selectedCoverImage;
   String _teachingMethod = 'theoretical'; // theoretical أو practical
+  String _materialInputType = 'file'; // 'file' أو 'youtube' للمقررات والمحاضرات
 
   @override
   void initState() {
@@ -47,6 +47,11 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
 
     _selectedFileName = widget.initialData?['fileName'];
     _selectedCoverImage = widget.initialData?['coverImage'];
+
+    // إذا وُجد رابط مسبقاً في وضع التعديل، نجعل النوع افتراضياً يوتيوب
+    if (widget.initialData?['link'] != null && (widget.initialData?['link'] as String).isNotEmpty) {
+      _materialInputType = 'youtube';
+    }
   }
 
   @override
@@ -123,7 +128,7 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
             ),
             const SizedBox(height: 15),
 
-            // 2. حقل الأستاذ (يظهر فقط إذا كنا في المكتبة العامة، أما في المقرر فيمكن معرفة الأستاذ تلقائياً من تسجيل الدخول)
+            // 2. حقل الأستاذ (يظهر فقط في المكتبة العامة)
             if (!widget.isCourseMaterial) ...[
               TextField(
                 controller: _authorController,
@@ -137,7 +142,7 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
               const SizedBox(height: 15),
             ],
 
-            // 3. الوصف أو الملاحظات (مهم للمقررات والمكتبة)
+            // 3. الوصف أو الملاحظات
             TextField(
               controller: _descController,
               maxLines: 2,
@@ -150,7 +155,38 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
             ),
             const SizedBox(height: 20),
 
-            // 4. رفع الملف أو رابط الفيديو (حسب التقييد)
+            // 4. خيار التبديل بين (إرفاق ملف PDF) أو (رابط يوتيوب) للمحاضرات والمقررات
+            if (widget.isCourseMaterial) ...[
+              Text('طريقة الإدراج:', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Cairo', color: isDarkMode ? Colors.white : Colors.black87)),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: const Text('إرفاق ملف (PDF)', style: TextStyle(fontFamily: 'Cairo', fontSize: 13)),
+                      value: 'file',
+                      groupValue: _materialInputType,
+                      activeColor: primaryGreen,
+                      contentPadding: EdgeInsets.zero,
+                      onChanged: (value) => setState(() => _materialInputType = value!),
+                    ),
+                  ),
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: const Text('رابط يوتيوب', style: TextStyle(fontFamily: 'Cairo', fontSize: 13)),
+                      value: 'youtube',
+                      groupValue: _materialInputType,
+                      activeColor: primaryGreen,
+                      contentPadding: EdgeInsets.zero,
+                      onChanged: (value) => setState(() => _materialInputType = value!),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+            ],
+
+            // للمحتوى المختلط العام
             if (widget.restriction == UploadRestriction.mixedContent) ...[
               Text('نوع المادة العلمية:', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Cairo', color: isDarkMode ? Colors.white : Colors.black87)),
               const SizedBox(height: 10),
@@ -181,8 +217,10 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
               const SizedBox(height: 15),
             ],
 
-            // 👇 بناءً على اختيار الأستاذ، نظهر حقل الرابط أو حقل اختيار الملف:
-            if (widget.restriction == UploadRestriction.youtubeLink || _teachingMethod == 'practical') ...[
+            // 5. عرض حقل الرابط أو حقل اختيار الملف بناءً على الاختيار
+            if (widget.restriction == UploadRestriction.youtubeLink ||
+                _teachingMethod == 'practical' ||
+                (widget.isCourseMaterial && _materialInputType == 'youtube')) ...[
               TextField(
                 controller: _linkController,
                 keyboardType: TextInputType.url,
@@ -196,7 +234,7 @@ class _SmartUploadBottomSheetState extends State<SmartUploadBottomSheet> {
             ] else ...[
               Row(
                 children: [
-                  // إظهار غلاف اختياري فقط للمكتبة وليس للمقررات السريعة
+                  // إظهار غلاف اختياري للمكتبة
                   if (!widget.isCourseMaterial) ...[
                     Expanded(
                       child: InkWell(
