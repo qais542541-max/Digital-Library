@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:digital_library/features/layout/screens/main_screen.dart';
 import 'package:digital_library/features/auth/screens/activation/account_activation_screen.dart';
@@ -17,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isObscure = true;
   bool _isLoading = false;
 
-  void _performLogin() {
+  void _performLogin() async {
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('يرجى إدخال اسم المستخدم وكلمة المرور', style: TextStyle(fontFamily: 'Cairo'))),
@@ -27,16 +31,104 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MainScreen(role: UserRole.student, userName: _usernameController.text),
-        ),
+    try {
+      String apiUrl = kIsWeb
+          ? 'http://localhost/lib_book2/api/login.php'
+          : 'http://192.168.1.100/lib_book2/api/login.php';
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: {
+          'ajax_login': '1',
+          'username': _usernameController.text,
+          'password': _passwordController.text,
+          'remember': '1',
+        },
       );
-    });
+
+      if (response.statusCode == 200) {
+        // فك تشفير الرد
+        dynamic responseData;
+        try {
+          responseData = json.decode(response.body);
+        } catch (e) {
+          // إذا لم يكن الرد JSON، قد يكون نصاً عادياً مثل "1" أو "success"
+          responseData = response.body.trim();
+        }
+
+        bool isSuccess = false;
+        String? roleStr;
+        String? nameStr;
+
+        if (responseData is Map) {
+          // التحقق من حالة النجاح في الـ JSON
+          isSuccess = (responseData['status'] == 'success' || 
+                       responseData['success'] == true || 
+                       responseData['status'] == '1' ||
+                       responseData['status'] == 1) &&
+                      (responseData['error'] == null || responseData['error'] == false);
+          
+          roleStr = responseData['role']?.toString();
+          nameStr = responseData['user']?['name'] ?? responseData['name'];
+        } else if (responseData == '1' || responseData == 'success') {
+          isSuccess = true;
+        }
+
+        if (isSuccess) {
+          if (!mounted) return;
+          
+          UserRole role = UserRole.student;
+          String receivedRole = roleStr?.toLowerCase() ?? '';
+          if (receivedRole == 'teacher') role = UserRole.teacher;
+          else if (receivedRole == 'employee') role = UserRole.employee;
+
+          // حفظ الجلسة
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+          await prefs.setString('userName', nameStr ?? _usernameController.text);
+          await prefs.setString('userRole', receivedRole);
+
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainScreen(
+                role: role,
+                userName: nameStr ?? _usernameController.text,
+              ),
+            ),
+          );
+        } else {
+          if (!mounted) return;
+          // عرض رسالة خطأ دقيقة بناءً على رد السيرفر
+          String errorMsg = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+          if (responseData is Map && responseData['message'] != null) {
+            errorMsg = responseData['message'];
+          } else if (responseData is Map && responseData['error'] != null && responseData['error'] is String) {
+            errorMsg = responseData['error'];
+          }
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMsg, style: const TextStyle(fontFamily: 'Cairo')),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        }
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('خطأ في السيرفر: ${response.statusCode}', style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.redAccent),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('حدث خطأ في الاتصال: $e', style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.redAccent),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _loginAsGuest() {

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // 👈 ضروري جداً للتحكم بشريط النظام
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/providers/settings_provider.dart';
 import 'features/login/screens/login_screen.dart';
+import 'features/layout/screens/main_screen.dart';
 
 const Color appPrimaryGreen = Color(0xFF2E7D32);
 
@@ -83,7 +85,54 @@ class DigitalLibraryApp extends StatelessWidget {
         ),
       ),
 
-      home: const LoginScreen(),
+      home: const AuthWrapper(),
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  Future<Map<String, dynamic>> _checkSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    if (!isLoggedIn) return {'isLoggedIn': false};
+
+    final userName = prefs.getString('userName') ?? '';
+    final roleStr = prefs.getString('userRole') ?? 'student';
+    
+    UserRole role = UserRole.student;
+    if (roleStr == 'teacher') role = UserRole.teacher;
+    else if (roleStr == 'employee') role = UserRole.employee;
+    else if (roleStr == 'external') role = UserRole.external;
+
+    return {
+      'isLoggedIn': true,
+      'userName': userName,
+      'role': role,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _checkSession(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator(color: appPrimaryGreen)),
+          );
+        }
+
+        if (snapshot.hasData && snapshot.data!['isLoggedIn'] == true) {
+          return MainScreen(
+            role: snapshot.data!['role'],
+            userName: snapshot.data!['userName'],
+          );
+        }
+
+        return const LoginScreen();
+      },
     );
   }
 }

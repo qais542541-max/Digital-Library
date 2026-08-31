@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/downloads/screens/downloads_screen.dart';
 import '../../features/favorites/screens/favorites_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/about_us/about_screen.dart';
 import '../../features/settings/screens/profile_screen.dart';
 import '../../features/layout/screens/main_screen.dart';
-// في ملف main_screen.dart
+import '../../features/login/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/settings_provider.dart';
 
@@ -154,9 +155,21 @@ class CustomDrawer extends StatelessWidget {
                 fontFamily: 'Cairo',
               ),
             ),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
-              // TODO: مسار العودة لشاشة تسجيل الدخول
+              
+              if (role != UserRole.guest) {
+                // مسح الجلسة عند تسجيل الخروج
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
+              }
+              
+              // العودة لشاشة تسجيل الدخول
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                (route) => false,
+              );
             },
           ),
           const SizedBox(height: 16),
