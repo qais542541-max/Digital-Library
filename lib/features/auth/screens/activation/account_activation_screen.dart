@@ -120,8 +120,8 @@ class _AccountActivationScreenState extends State<AccountActivationScreen> {
     setState(() => _isLoading = true);
     try {
       String apiUrl = kIsWeb
-          ? 'http://localhost/lib_book2/public/send_verification.php'
-          : 'http://192.168.1.100/lib_book2/public/send_verification.php';
+          ? 'http://localhost/lib_book2/api/send_verification.php'
+          : 'http://192.168.1.102/lib_book2/api/send_verification.php';
 
       // تجهيز البيانات بناءً على الدور
       Map<String, dynamic> payload;
@@ -143,9 +143,8 @@ class _AccountActivationScreenState extends State<AccountActivationScreen> {
           "password": _passwordController.text,
         };
       } else {
-        // للأدوار الأكاديمية (طالب/مدرس) نستخدم البيانات المستلمة سابقاً من check_member
         payload = {
-          "phone": _memberData?['phone'] ?? "77", // الافتراضي إذا لم يعد من السيرفر
+          "phone": _memberData?['phone'] ?? "77",
           "email": _memberData?['email'] ?? "a1^@g.com",
           "verification_method": "email",
           "member_id": int.tryParse(_memberData?['id']?.toString() ?? "0") ?? 0,
@@ -165,7 +164,7 @@ class _AccountActivationScreenState extends State<AccountActivationScreen> {
       var response = await http.post(
         Uri.parse(apiUrl),
         headers: {
-          'Accept': '*/*',
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
           'User-Agent': 'Mozilla/5.0',
         },
@@ -173,16 +172,97 @@ class _AccountActivationScreenState extends State<AccountActivationScreen> {
       );
 
       if (response.statusCode == 200) {
-        _moveToNextStep(); // الانتقال لخطوة إدخال الـ OTP
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        if (responseData['success'] == true) {
+          // 👇 إظهار الكود في الشاشة لتسهيل التجربة للمطور
+          if (responseData['debug_otp'] != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('للتجربة، كود التحقق هو: ${responseData['debug_otp']}', style: const TextStyle(fontFamily: 'Cairo')),
+                backgroundColor: Colors.blueAccent,
+                duration: const Duration(seconds: 15), // إبقاء الرسالة لفترة أطول لتتمكن من حفظه
+              ),
+            );
+          }
+          _moveToNextStep(); // الانتقال لخطوة إدخال الـ OTP
+        } else {
+          throw Exception(responseData['message'] ?? 'فشل في إرسال الرمز');
+        }
       } else {
-        throw Exception('فشل في إرسال رمز التحقق: ${response.body}');
+        throw Exception('فشل الاتصال بالسيرفر: ${response.statusCode}');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('خطأ في إرسال الكود: $e', style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.redAccent),
+        SnackBar(content: Text('خطأ: $e', style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.redAccent),
       );
     } finally {
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _verifyOTP() async {
+    if (_otpController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى إدخال رمز التحقق', style: TextStyle(fontFamily: 'Cairo'))),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // 1. تحديد الرابط الصحيح (تأكد من IP جهازك 102)
+      String apiUrl = kIsWeb
+          ? 'http://localhost/lib_book2/api/verify_otp.php'
+          : 'http://192.168.1.102/lib_book2/api/verify_otp.php'; // تم التغيير إلى api/
+
+      // 2. تجهيز البيانات للإرسال بصيغة JSON
+      final payload = {
+        "email": _selectedRole == 'external' ? _emailController.text : (_memberData?['email'] ?? ''),
+        "otp": _otpController.text.trim(),
+      };
+
+      // 3. طباعة مساعدة للمطور لمعرفة ما يتم إرساله
+      debugPrint("Sending to API: $apiUrl");
+      debugPrint("Payload: $payload");
+
+      var response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Accept': '*/*', // تعديل الهيدر ليقبل أي نوع
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0', // لتجنب رفض بعض السيرفرات للطلبات من التطبيقات
+        },
+        body: json.encode(payload),
+      ).timeout(const Duration(seconds: 15)); // زيادة وقت الانتظار قليلاً
+
+      debugPrint("Response Status: ${response.statusCode}");
+      debugPrint("Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        if (responseData['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(responseData['message'] ?? 'تم تفعيل الحساب بنجاح! يمكنك الآن تسجيل الدخول.', style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.green),
+          );
+          Navigator.pop(context); // العودة لتسجيل الدخول
+        } else {
+          throw Exception(responseData['message'] ?? 'رمز التحقق غير صحيح');
+        }
+      } else {
+        throw Exception('فشل الاتصال بالسيرفر. رمز الخطأ: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e'.replaceAll('Exception: ', ''), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.redAccent),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -199,21 +279,12 @@ class _AccountActivationScreenState extends State<AccountActivationScreen> {
       setState(() => _isLoading = true);
 
       try {
-        // تحديد الرابط بناءً على النظام (ويب أو أندرويد)
-        String apiUrl;
-        if (kIsWeb) {
-          apiUrl = 'http://localhost/lib_book2/public/check_member.php';
-        } else {
-          apiUrl = 'http://192.168.1.100/lib_book2/public/check_member.php';
-        }
+        String apiUrl = kIsWeb
+            ? 'http://localhost/lib_book2/check_member.php'
+            : 'http://192.168.1.102/lib_book2/check_member.php'; // تم التغيير إلى api/
 
         var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-
-        request.headers.addAll({
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0',
-        });
-
+        request.headers.addAll({'Accept': 'application/json'});
         request.fields['member_id'] = _idController.text.trim();
         request.fields['member_type'] = _selectedRole;
 
@@ -222,27 +293,21 @@ class _AccountActivationScreenState extends State<AccountActivationScreen> {
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> responseData = json.decode(response.body);
-          
-          if (responseData['status'] == 'success' || responseData['data'] != null) {
-            // عرض بيانات المستخدم في نافذة للتأكيد
-            _showUserDataDialog(responseData['data'] ?? responseData);
+
+          // 👇 التعديل هنا: نتحقق من responseData['success'] == true كما يرسلها السيرفر
+          if (responseData['success'] == true && responseData['data'] != null) {
+            _showUserDataDialog(responseData['data']);
           } else {
-            throw Exception('البيانات غير صحيحة');
+            throw Exception(responseData['message'] ?? 'البيانات غير صحيحة');
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('الرقم غير مسجل في النظام. يرجى التأكد من البيانات.', style: TextStyle(fontFamily: 'Cairo')),
-              backgroundColor: Colors.redAccent,
-            ),
+            const SnackBar(content: Text('الرقم غير مسجل في النظام. يرجى التأكد من البيانات.', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.redAccent),
           );
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('حدث خطأ: $e', style: const TextStyle(fontFamily: 'Cairo')),
-            backgroundColor: Colors.redAccent,
-          ),
+          SnackBar(content: Text('حدث خطأ: $e', style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.redAccent),
         );
       } finally {
         setState(() => _isLoading = false);
@@ -250,8 +315,7 @@ class _AccountActivationScreenState extends State<AccountActivationScreen> {
       return;
     }
 
-    // 2. إرسال رمز التحقق (عند المتابعة من خطوة بيانات الدخول)
-    // خطوة بيانات الدخول هي الأخيرة قبل خطوة التحقق (OTP)
+    // 2. إرسال رمز التحقق
     if (_currentStep == _totalSteps - 2) {
       if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -263,17 +327,17 @@ class _AccountActivationScreenState extends State<AccountActivationScreen> {
       return;
     }
 
-    // المنطق الافتراضي لباقي الخطوات أو للزائر
+    // 3. التحقق من الـ OTP (الخطوة الأخيرة)
+    if (_currentStep == _totalSteps - 1) {
+      await _verifyOTP();
+      return;
+    }
+
+    // التنقل العادي بين الخطوات
     if (_currentStep < _totalSteps - 1) {
       _moveToNextStep();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم تفعيل الحساب بنجاح!', style: TextStyle(fontFamily: 'Cairo'))),
-      );
-      Navigator.pop(context);
     }
   }
-
   void _previousStep() {
     if (_currentStep > 0) {
       _pageController.previousPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
